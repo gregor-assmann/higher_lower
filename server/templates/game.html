@@ -18,13 +18,12 @@
         <div class="product-container">
             <div class="product-box" id="product1">
                 <div class="img-wrap">
-                    <img src="https://i.otto.de/i/otto/b526a55c-e43f-54fd-8155-652b8d4688df/hisense-43e6nt-led
-                -fernseher-108-cm-43-zoll-4k-ultra-hd-smart-tv-4k-uhd.jpg?$formatz$" alt="Produkt 1">
+                    <img src={{productLast_high_q_img}} alt="Produkt 1">
                 </div>
-                <div class="meta">
-                    <h2>Dummy Marke</h2>
-                    <h3>43E6NT LED-Fernseher</h3>
-                    <p>449.00 €</p>
+                <div class="meta" id="product1">
+                    <h2>{{productLast_brand}}</h2>
+                    <h3>{{productLast_name}}</h3>
+                    <p>Preis: {{productLast_price}} €</p>
                     <p>lieferbar - in 2-3 Werktagen bei dir</p>
                     <p>Placeholder Otto Up</p>
                 </div>
@@ -37,13 +36,12 @@
 
             <div class="product-box" id="product2">
                 <div class="img-wrap">
-                    <img src="https://i.otto.de/i/otto/4ed95405-d686-586f-8639-97b5119d5fc6/lenovo-ideapad-3-chrome
-                -15ijl6-8gb-ram-128gb-emmc-chromebook-39-6-cm-15-6-zoll-intel-celeron-n4500-uhd-graphics-chromeos-clamshell-laptop-with-full-hd-panel.jpg?$formatz$" alt="Produkt 2">
+                    <img src="{{productNext_high_q_img}}" alt="Produkt 2">
                 </div>
                 <div class="meta">
-                    <h2>Dummy Marke</h2>
-                    <h3>IdeaPad 3 Chrome 15IJL6 8GB RAM / 128GB eMMC Chromebook</h3>
-                    <p>Preis: 129,99 €</p>
+                    <h2>{{productNext_brand}}</h2>
+                    <h3>{{productNext_name}}</h3>
+                    <p>Preis: {{productNext_price}} €</p>
                     <p>lieferbar - in 2-3 Werktagen bei dir</p>
                     <p>Placeholder Otto Up</p>
                 </div>
