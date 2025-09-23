@@ -43,7 +43,7 @@ class ProductCollection:
             self.products = products
 
     def load_products(self, file_path):
-        with open(file_path) as f:
+        with open(file_path, encoding='utf-8') as f:
             categories = json.load(f)
             products = None
             if self.category is None:
