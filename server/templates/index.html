@@ -26,7 +26,7 @@
                 {% for idx in range(5) %}
                 <div class="leaderboard-element">
                     <span class="leaderboard-place">{{idx + 1}}.</span>
-                    <span class="leaderboard-name">{{name_list[idx]}} {%if own_position == idx %} (Du) {%endif%}</span>
+                    <span class="leaderboard-name">{{name_list[idx]}} {%if own_position == (idx+1) and name_list[idx] == own_name %} (Du) {%endif%}</span>
                     <span class="leaderboard-score">{{score_list[idx]}}</span>
                 </div>
                 {%endfor%}
@@ -34,7 +34,7 @@
                 {%if not firstGame%}
                     {% if own_position >= 5 %}
                 <div class="leaderboard-element-player">
-                    <span class="leaderboard-place">{{own_position}}</span>
+                    <span class="leaderboard-place">{{own_position}}.</span>
                     <span class="leaderboard-name">{{own_name}} (Du)</span>
                     <span class="leaderboard-score">{{own_score}}</span>
                 </div>

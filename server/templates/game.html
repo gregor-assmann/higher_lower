@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Higher or Lower</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/game.js"></script>
 </head>
 <body>
-    <header>
+<header>
         <button class ="logo-button" onclick="location.href='/'">
             <img src="/static/images/pl_logo_otto.svg" alt="Logo" class="logo">
         </button>
@@ -16,51 +17,47 @@
 
     <main>
         <div class="product-container">
-            
-            <button class="noBorder" onclick="choose()">
-                <div class="product-box" id="product1">
-                    <div class = "image-wrapper">
-                        <img class="product-image" id="product-image1" src={{productLast_high_q_img}} alt="Produkt 1">
-                    </div>
-                    <div class="text-box" id="text-box1">
-                        <h2>{{productLast_brand}}</h2>
-                        <h3>{{productLast_name}}</h3>
-                        <p>Preis: <span class = "price-span">{{productLast_price}} €</span></p>
-                        <p>lieferbar - in 2-3 Werktagen bei dir</p>
-                        <img alt="Logo" class="UpLogo" id="UpLogo1" src="/static/images/otto-up-logo.png">
-                    </div>
+
+            <div class="product-box">
+                <img class="product-image" src={{productLast_high_q_img}} alt="Produkt">
+                <div class="text-box">
+                    <h2>{{productLast_brand}}</h2>
+                    <a>{{productLast_name}}</a>
+                    <p class="price">Preis: {{productLast_price}} €</p>
+                    <p>lieferbar - in {{productLast_parcel_time}} Werktagen bei dir</p>
+                    <img alt="Logo" class="UpLogo" src="/static/images/otto-up-logo.png">
                 </div>
-            </button>
-            
+            </div>
+
             <div class="center-container">
                 <div class="arrow-container">
                     <img id="arrow" class="arrow_red" src="/static/images/arrow.png">
                     <img class="logo-big" id="logobig" src="/static/images/pl_logo_otto.svg">
+                    <img class="check" id="check" src="/static/images/correct.png">
+                    <img class="check" id="check" src="/static/images/wrong.png">
                 </div>
+                
+                <span class = "game-over"> GAME OVER </span>
                 <div class="score-container">
                     <span class = "score-text"> Score: <span class ="score"> {{score}} </span></span>
                 </div>
+                
+                <button class = "return-button" onclick="location.href='/'"> Zurück</button>
             </div>
             
 
-            <button class="noBorder" onclick="choose()">
-                <div class="product-box" id="product2">
-                    <div class = "image-wrapper">
-                        <img class="product-image" id="product-image1" src={{productNext_high_q_img}} alt="Produkt 2">
-                    </div>
-                    <div class="text-box" id="text-box2">
-                        <h2>{{productNext_brand}}</h2>
-                        <h3>{{productNext_name}}</h3>
-                        <p>Preis: <span class = "price-span">{{productNext_price}} €</span></p>
-                        <p>lieferbar - in 2-3 Werktagen bei dir</p>
-                        <img alt="Logo" class="UpLogo" id="UpLogo2" src="/static/images/otto-up-logo.png">
-                    </div>
+            <div class="product-box">
+                <img class="product-image" src={{productNext_high_q_img}} alt="Produkt">
+                <div class="text-box">
+                    <h2>{{productNext_brand}}</h2>
+                    <a>{{productNext_name}}</a>
+                    <p class="price">Preis: {{productNext_price}} €</p>
+                    <p>lieferbar - in {{productNext_parcel_time}} Werktagen bei dir</p>
+                    <img alt="Logo" class="UpLogo" src="/static/images/otto-up-logo.png">
                 </div>
-            </button>
+            </div>
         </div>
     </main>
 
-    <script src="/static/js/script.js"></script>
-    <script src="static/js/request.js"></script>
 </body>
 </html>

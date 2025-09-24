@@ -94,13 +94,13 @@ h2 {
     font-family: 'OttoSans', sans-serif;
     color: #000;
     margin: 3px;
-    font-size: 1.2em;
+    font-size: 1em;
     align-self: left;
     margin-left: auto;
     margin-right: auto;
 }
 
-h3 {
+a {
     font-family: 'OttoSans', sans-serif;
     color: #000;
     margin: 10px;
@@ -153,6 +153,14 @@ p {
     cursor: pointer;
     display: grid;
     grid-template-rows: 1fr 1fr;
+    transition-duration: 500ms;
+}
+.moved{
+    transform: translateX(-730px);
+}
+
+.removed{
+    transform: translateX(-50vw);
 }
 
 .product-box img {
@@ -208,6 +216,13 @@ p {
     height: auto;
     transition: transform 0.5s ease; /* Soft Übergang */
     position: absolute;
+}
+
+.check {
+    width: 120px;
+    height: auto;
+    transition: transform 0.5s ease; /* Soft Übergang */
+    position: absolute;
 
 }
 
@@ -218,20 +233,31 @@ p {
     align-items: center;
 }
 
-.price-span{
+.price{
     font-weight: 700;
 }
 
 .center-container{
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .score-container{
+    margin: 10px;
     margin-top: 50px;
+    align-items: center;
+    justify-content: center;
+    scale: 1.1
 }
 
 .score-display{
     font-size: 1.2em;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    transition-duration: 2s;
 }
 .score{
     font-size: 1.2em;
@@ -239,11 +265,38 @@ p {
     color: #f00020;
 }
 
+.return-button {
+    padding:0.8rem 3rem ;
+    margin:15px;
+    font-size: 1.2em;
+    font-weight: 700;
+    background-color: #eb001f;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition-duration: 100ms;
+    min-width: 150px;
+    max-width: 500px;
+    display: none;
+}
+
+.return-button:hover {
+    background-color: #b80018;
+}
+
+.game-over{
+    font-size: 1.7em;
+    font-weight: 700;
+    display: none;
+}
+
 /* Media Queries (for phone screens)*/
 
 @media (max-width: 600px) {
     header {
         margin: 0;
+        padding-right: 20px;
     }
 
     .product-container {

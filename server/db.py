@@ -2,6 +2,11 @@ import sqlite3
 
 class leaderBoard:
     def __init__(self, dbPath):
+        print(dbPath)
+        try:
+            open(dbPath, 'x').close()
+        except:
+            pass
         self.conn = sqlite3.connect(dbPath, check_same_thread=False)
         self.cursor = self.conn.cursor()
         self.cursor.execute("CREATE TABLE IF NOT EXISTS leaderboard (name TEXT, score INTEGER)")

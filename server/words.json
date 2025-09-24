@@ -1,0 +1,24 @@
+{
+  "adjectives": [
+    "Stinky", "Slimy", "Sweaty", "Greasy", "Cheesy", "Fishy", "Gooey", "Lumpy", "Wobbly", "Gassy",
+    "Spotty", "Hairy", "Itchy", "Rusty", "Dusty", "Moldy", "Squeaky", "Burpy", "Chunky", "Clumsy",
+    "Dorky", "Fuzzy", "Grumpy", "Kooky", "Loopy", "Munchy", "Nutty", "Oozy", "Puffy", "Quirky",
+    "Runny", "Scratchy", "Soggy", "Tacky", "Twitchy", "Vomity", "Whacky", "Zany", "Awkward", "Blubbery",
+    "Crusty", "Dodgy", "Silly", "Icky", "Janky", "Knobby", "Lazy", "Mischievous",
+    "Nasty", "Obnoxious", "Peculiar", "Raucous", "Silly", "Trivial", "Waggly", "Yawning", "Zigzagging", "Bombastic",
+    "Shitty", "Goofy", "Grotesque", "Putrid", "Rank", "Revolting", "Screeching", "Sputtering", "Squishy", "Tarnished",
+    "Weird", "Gross", "Bizarre", "Crazy", "Stupid", "Awful", "Dumb", "Sloppy", "Smelly", "Greedy"
+  ],
+  "nouns": [
+    "Fingernails", "Pufferfish", "Pimple", "Armpit", "Bellybutton", "Toenail", "Noodle", "Pickle", "Sausage", "Donut",
+    "Booger", "Earwax", "Fart", "Gravel", "Hairball", "Jellybean", "Knee", "Lint", "Muffin", "Nosehair",
+    "Oatmeal", "Pancake", "Quiche", "Radish", "Spaghetti", "Taco", "Underwear", "Vomit", "Waffle", "Zucchini",
+    "Antenna", "Bubblegum", "Cactus", "Dandelion", "Eel", "Flea", "Gnat", "Hamster", "Iguana", "Jigsaw",
+    "Kitten", "Lobster", "Marmalade", "Nugget", "Ostrich", "Pebble", "Quail", "Rattlesnake", "Sardine", "Tarantula",
+    "Umbrella", "Vulture", "Walrus", "X-ray", "Yak", "Zebra", "Accordion", "Banjo", "Cello", "Didgeridoo",
+    "Jug", "Kazoo", "Lute", "Maraca", "Nailfile", "Ocarina", "Pencil", "Quill", "Ruler", "Spoon",
+    "Yo-yo", "Zipper", "Bagpipe", "Blackhead", "Whitehead", "Sebum", "Cyst", "Wart", "Mole",
+    "Freckle", "Scar", "Bruise", "Blister", "Rash", "Pockmark", "Crack", "Callus", "Corn", "Bunion", "Hammertoe", "Ingrowntoenail",
+    "Roadkill", "Snotrocket", "Garbagepatch", "Diaperrash", "Sweatstain", "Toiletseat", "Scrotumsack", "Bellyfluff", "Cheesetoes", "Buttcrack"
+  ]
+}

@@ -8,12 +8,14 @@ scraper/*.egg-info
 
 # Virtual environments possibly generated in scraper
 scraper/.venv
-
+server/DB/
 # VsCode settings
 server/.vscode/
 server/__pycache__
+
 
 #Python test file for db
 test.py
 
 .vscode/
+server/DB/leaderboard.db

@@ -3,12 +3,14 @@ from os import path
 import random
 
 class Product:
-    def __init__(self,brand, name, price, img, high_q_img = None):
+    def __init__(self,brand, name, price, img, link = None, high_q_img = None, alt="product"):
         self.brand = brand
         self.name = name
         self.price = float(price)
         self.img = img
         self.high_q_img = high_q_img
+        self.alt = alt
+        self.link = link
 
     # Calculates how similar in price products are
     def get_product_relation(self, other, threshold = 1.2):

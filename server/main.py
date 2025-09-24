@@ -6,6 +6,7 @@ import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from pathlib import Path
 from db import leaderBoard
+from randomgenerator import generate_nickname, generate_parceltime
 
 dirname = str(Path(__file__).parent.parent)
 
@@ -15,6 +16,9 @@ class Game:
       self.collection = ProductCollection((dirname + r'/scraper/articles.json') if article_file_path is None else article_file_path)
       self.productLast = self.collection.next_product()
       self.productNext = self.collection.next_product(self.productLast)
+      self.LastParcelTime = generate_parceltime()
+      self.NextParcelTime = generate_parceltime()
+      self.gameOver = False
       self.expiresAt = datetime.datetime.now() + datetime.timedelta(minutes=5) # game expires in 30 minutes
    
    def expired(self):
@@ -26,6 +30,8 @@ class Game:
    def nextProduct(self):
       self.productLast = self.productNext
       self.productNext = self.collection.next_product(self.productLast)
+      self.LastParcelTime = self.NextParcelTime
+      self.NextParcelTime = generate_parceltime()
    
    def checkGuess(self, userGuess):
       self.extend_time()
@@ -45,15 +51,18 @@ class Game:
          "score": self.score,
          "productLast_brand": self.productLast.brand,
          "productLast_price": self.productLast.price,
+         "productLast_link": self.productLast.link,
          "productLast_name": self.productLast.name,
          "productLast_img": self.productLast.img,
          "productLast_high_q_img": self.productLast.high_q_img,
+         "productLast_parcel_time": self.LastParcelTime,
 
          "productNext_brand": self.productNext.brand,
          "productNext_price": self.productNext.price if not CensorNextPrice else "???",
          "productNext_name": self.productNext.name,
          "productNext_img": self.productNext.img,
          "productNext_high_q_img": self.productNext.high_q_img,
+         "productNext_parcel_time": self.NextParcelTime,
       }
 
 games = {}
@@ -84,11 +93,11 @@ def index():
       
       #leaderboard logic
       if not firstgame: #leaderboard update
-         leaderBoard.add_score(session.get('name', 'Anonymous'), lastScore)
+         leaderBoard.add_score(session.get('name'), lastScore)
       leaderBoardData = leaderBoard.get_top_scores_dict(5) # get leaderboard from leaderboard.db
 
       if not firstgame: # adding own score and name to leaderboard data if not first game
-         leaderBoardData["own_name"] = session.get('name', 'Anonymous')
+         leaderBoardData["own_name"] = session.get('name')
          leaderBoardData["own_score"] = lastScore
          leaderBoardData["own_position"] = leaderBoard.get_position(lastScore)
       
@@ -114,6 +123,8 @@ def game():
          return redirect(url_for('new_game'))
       else:
          currentGame = games[session['sessionID']]
+         if currentGame.gameOver:
+            return redirect(url_for('index'))
          return render_template("game.html", **currentGame.toDict(True))
 
 @app.route("/guess", methods = ['POST'])
@@ -126,21 +137,27 @@ def guess():
          return redirect(url_for('new_game'))
       else:
          currentGame = games[session['sessionID']]
-         #get user guess from form
          user_guess = request.json['guess']
-         if currentGame.checkGuess(user_guess): # if correct guess deliver new product
+         guessed_correctly = currentGame.checkGuess(user_guess)
+         currentGame.nextProduct()
+         dict = currentGame.toDict(True)
+         #get user guess from form
+         if guessed_correctly: # if correct guess deliver new product
             print("Guessed correctly")
-            currentGame.score += 1
-            currentGame.nextProduct()
-            return jsonify(currentGame.toDict(True)) # censor next price
+            currentGame.score += 1            
+            dict['correct'] = True
+            return jsonify(dict) # censor next price
          else:
-            # if wrong return to title screen with score
-            return redirect(url_for("test"))
+            dict['correct'] = False
+            currentGame.gameOver = True
+            return jsonify(dict)
 
 @app.route("/setname", methods = ['POST'])
 def setname():
    name = request.form['username']
    session['name'] = name
+   if(name == ""):
+      session['name'] = generate_nickname(dirname + r"/server/words.json")
    return redirect(url_for('new_game'))
 
 @app.route("/test")
