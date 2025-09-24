@@ -223,7 +223,6 @@ p {
     height: auto;
     transition: transform 0.5s ease; /* Soft Übergang */
     position: absolute;
-
 }
 
 .index-container {
