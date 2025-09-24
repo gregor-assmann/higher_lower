@@ -59,6 +59,7 @@ class Game:
 
          "productNext_brand": self.productNext.brand,
          "productNext_price": self.productNext.price if not CensorNextPrice else "???",
+         "productNext_link": self.productNext.link if not CensorNextPrice else None,
          "productNext_name": self.productNext.name,
          "productNext_img": self.productNext.img,
          "productNext_high_q_img": self.productNext.high_q_img,

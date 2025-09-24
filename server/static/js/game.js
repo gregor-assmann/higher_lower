@@ -49,7 +49,7 @@ async function send_guess() {
         }
         else {
             displayWrong();
-            game_over();
+            game_over(response);
         }
     });
 }
@@ -60,6 +60,7 @@ function load_next_product(response) {
     product2.removeEventListener('mouseenter', enter_rotate);
     product2.removeEventListener('mouseleave', leave_rotate);
     product2.removeEventListener('click', send_guess);
+    product2.childNodes[3].childNodes[3].href = response.productLast_link
     score.innerHTML = response.score + 1
 
     document.querySelector('.product-container').insertAdjacentHTML('beforeend', `<div class="product-box">
@@ -135,7 +136,7 @@ function leave_rotate() {
     logobig.style.display = 'none';
 }
 
-function game_over() {
+function game_over(response) {
     product1.removeEventListener('mouseenter', enter_rotate);
     product1.removeEventListener('mouseleave', leave_rotate);
     product1.removeEventListener('click', send_guess);
@@ -143,6 +144,8 @@ function game_over() {
     product2.removeEventListener('mouseenter', enter_rotate);
     product2.removeEventListener('mouseleave', leave_rotate);
     product2.removeEventListener('click', send_guess);
+    
+    product2.childNodes[3].childNodes[3].href = response.productNext_link
 }
 
 function displayCorrect(offset){
