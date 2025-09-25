@@ -87,6 +87,8 @@ function insertAfter(referenceNode, newNode) {
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
+
+
 function setup() {
     arrow = document.getElementById('arrow');
     logobig = document.getElementById('logobig');
@@ -120,8 +122,24 @@ function setup() {
     product1.addEventListener('mouseleave', leave_rotate);
     product2.addEventListener('mouseleave', leave_rotate);
 
+    // Klick auf die Produktboxen
     product1.addEventListener('click', send_guess);
     product2.addEventListener('click', send_guess);
+
+    // Verhindere, dass Klicks auf Links send_guess auslösen
+    const product1Link = product1.querySelector('.text-box a');
+    if (product1Link) {
+        product1Link.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    }
+
+    const product2Link = product2.querySelector('.text-box a');
+    if (product2Link) {
+        product2Link.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    }
 }
 
 function enter_rotate() {
