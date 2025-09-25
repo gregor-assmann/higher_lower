@@ -199,15 +199,15 @@ main {
 }
 
 [class*="difficulty normal"] .label-text {
-  background-color: rgb(236, 214, 74);
+  background-color: rgb(236, 214, 100);
 }
 
 [class*="difficulty hard"] .label-text { 
-  background-color: rgb(236, 156, 95);
+  background-color: rgb(236, 156, 100);
 }
 
 [class*="difficulty extrem"] .label-text {
-  background-color: rgb(235, 110, 96);
+  background-color: rgb(236, 110, 100);
   
 }
 
