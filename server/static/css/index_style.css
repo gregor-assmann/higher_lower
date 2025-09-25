@@ -195,15 +195,26 @@ main {
     background-color: #d1cfcf;
     color: black;
     border-radius: 10px 10px 0 0;
+    box-shadow: inset 0px -8px 6px -6px rgba(0, 0, 0, 0.29);
 }
-/*
-[class*="difficulty normal"] .label-text {  Könnte man machen 
+
+[class*="difficulty normal"] .label-text {
   background-color: rgb(236, 214, 74);
-}*/
+}
+
+[class*="difficulty hard"] .label-text { 
+  background-color: rgb(236, 156, 95);
+}
+
+[class*="difficulty extrem"] .label-text {
+  background-color: rgb(235, 110, 96);
+  
+}
 
 /* Aktiver Zustand (einfacher, kein Animationseffekt) */
 .difficulty input:checked + .label-text {
     background-color: white;
+    box-shadow: inset 0px 0px 0px -0px black;
 }
 
 .difficulty:has(input:checked) + .difficulty .label-text {
