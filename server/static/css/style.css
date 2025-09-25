@@ -115,6 +115,11 @@ a {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    pointer-events: none;
+}
+
+a[href] {
+    pointer-events: auto;
 }
 
 p {
