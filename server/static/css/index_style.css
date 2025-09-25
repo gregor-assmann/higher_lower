@@ -219,13 +219,13 @@ main {
 
 .difficulty:has(input:checked) + .difficulty .label-text {
     border-bottom-left-radius: 10px;
+    box-shadow: inset 8px -8px 6px -6px rgba(0, 0, 0, 0.29);
 }
 
 .difficulty:has(+ .difficulty input:checked) .label-text {
     border-bottom-right-radius: 10px;
+    box-shadow: inset -8px -8px 6px -6px rgba(80, 80, 80, 0.29);
 }
-
-
 
 .hidden {
     display: none;
