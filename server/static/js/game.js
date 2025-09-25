@@ -69,7 +69,7 @@ function load_next_product(response) {
                     <img class="product-image" src=${response.productNext_high_q_img} alt="Produkt">
                     <div class="text-box">
                         <h2>${response.productNext_brand}</h2>
-                        <a>${response.productNext_name}</a>
+                        <a target="_blank" rel="noopener noreferrer">${response.productNext_name}</a>
                         <p class="price">Preis: ${response.productNext_price} €</p>
                         <p>lieferbar - in ${response.productNext_parcel_time} Werktagen bei dir</p>
                         <img alt="Logo" class="UpLogo" src="/static/images/otto-up-logo.png">
