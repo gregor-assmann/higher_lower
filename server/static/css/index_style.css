@@ -196,10 +196,18 @@ main {
     color: black;
     border-radius: 10px 10px 0 0;
 }
-/*
-[class*="difficulty normal"] .label-text {  Könnte man machen 
+
+[class*="difficulty normal"] .label-text {
   background-color: rgb(236, 214, 74);
-}*/
+}
+
+[class*="difficulty hard"] .label-text { 
+  background-color: rgb(236, 144, 74);
+}
+
+[class*="difficulty extrem"] .label-text {
+  background-color: rgb(236, 90, 74);
+}
 
 /* Aktiver Zustand (einfacher, kein Animationseffekt) */
 .difficulty input:checked + .label-text {
