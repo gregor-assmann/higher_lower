@@ -45,15 +45,15 @@
             </div>
             {%endfor%}
 
-                {%if not firstGame%}
-                    {% if leaderBoardData["own_position"] >= 5 %}
-                <div class="leaderboard-element-player" data-name={{leaderBoardData["own_difficulty"]}}>
-                    <span class="leaderboard-place">{{leaderBoardData["own_position"]}}.</span>
-                    <span class="leaderboard-name">{{leaderBoardData["own_name"]}} (Du)</span>
-                    <span class="leaderboard-score">{{leaderBoardData["own_score"]}}</span>
-                </div>
-                    {%endif%}
+            {%if not firstGame%}
+                {% if leaderBoardData["own_position"] >= 5 %}
+            <div class="leaderboard-element-player" data-name={{leaderBoardData["own_difficulty"]}}>
+                <span class="leaderboard-place">{{leaderBoardData["own_position"]}}.</span>
+                <span class="leaderboard-name">{{leaderBoardData["own_name"]}} (Du)</span>
+                <span class="leaderboard-score">{{leaderBoardData["own_score"]}}</span>
+            </div>
                 {%endif%}
+            {%endif%}
                
             <form id="start-game-form" method="POST" action="/new_game" class="start-game-form">
                 <input name="username" type="text" class="username-input" placeholder="Gib deinen Namen ein" value={{leaderBoardData["own_name"]}}>
