@@ -14,7 +14,6 @@ var overrideCheckmark = true
 var correctAudio = new Audio('/static/sounds/mixkit-correct-answer-tone-2870.wav');
 var wrongAudio = new Audio('/static/sounds/mixkit-wrong-answer-fail-notification-946.wav');
 
-
 document.addEventListener("DOMContentLoaded", (event) => {
     setup();
 });
@@ -41,11 +40,14 @@ async function send_guess() {
         //console.log(response)
         if (response.correct) {
             overrideCheckmark = false
-            let pos1 = getOffset(product1)
-            let pos2 = getOffset(product2)
-            let offset = pos1 - pos2
-            displayCorrect(offset);
-            animateNewProduct(offset, response);
+            let pos1X = getOffset(product1).x
+            let pos2X = getOffset(product2).x
+            let offsetX = pos1X - pos2X
+            let pos1Y = getOffset(product1).y
+            let pos2Y = getOffset(product2).y
+            let offsetY = pos1Y - pos2Y
+            displayCorrect();
+            animateNewProduct(offsetX, offsetY, response);
             correctAudio.play();
             
         }
@@ -166,7 +168,7 @@ function game_over(response) {
     product2.removeEventListener('click', send_guess);
 }
 
-function displayCorrect(offset){
+function displayCorrect(){
     arrow.style.display= "none"
     correct.style.display = "block"
     logobig.style.display = "none"
@@ -181,13 +183,13 @@ function displayCorrect(offset){
     product2.removeEventListener('click', send_guess);
 }
 
-function animateNewProduct(offset, response){
+function animateNewProduct(offsetX, offsetY, response){
     setTimeout(() => {
-            product1.style.transform = `translateX(${offset}px)`;
-            product2.style.transform = `translateX(${offset}px)`;
+            product1.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            product2.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
                 setTimeout(() => {
                 load_next_product(response);
-                product2.style.transform = `translateX(${-offset}px)`;
+                product2.style.transform = `translateX(${-offsetX}px, ${offsetY}px)`;
                 product1.style.transform = `translateX(0px)`;
                 setTimeout(() => {
                     product2.style.transform = `translateX(0px)`;
@@ -213,7 +215,7 @@ function animateNewProduct(offset, response){
 function displayWrong(){
     arrow.style.display= "none";
     wrong.style.display = "block";
-    score_display.style.zoom = 1.4;
+    score_display.style.zoom = window.innerWidth > 600 ? 1.4 : 1;
     return_button.style.display = 'block'
     game_over_display.style.display= 'flex'
 
@@ -221,6 +223,8 @@ function displayWrong(){
 
 function getOffset(el) {
   const rect = el.getBoundingClientRect();
-  return rect.left + window.scrollX
-
+  return {
+    x: rect.left + window.scrollX,
+    y: rect.top + window.scrollY
+  };
 }
