@@ -189,10 +189,10 @@ function animateNewProduct(offsetX, offsetY, response){
             product2.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
                 setTimeout(() => {
                 load_next_product(response);
-                product2.style.transform = `translateX(${-offsetX}px, ${offsetY}px)`;
-                product1.style.transform = `translateX(0px)`;
+                product2.style.transform = `translate(${-offsetX}px, ${-offsetY}px)`;
+                product1.style.transform = `translate(0px, 0px)`;
                 setTimeout(() => {
-                    product2.style.transform = `translateX(0px)`;
+                    product2.style.transform = `translate(0px, 0px)`;
                     overrideCheckmark = true
                     correct.style.display = "none"
                     arrow.style.display = "block"

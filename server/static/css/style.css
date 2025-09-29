@@ -303,6 +303,7 @@ p {
     header {
         margin: 0;
         padding-right: 20px;
+        z-index: 2;
     }
 
     .product-container {
@@ -314,6 +315,7 @@ p {
         height: 0px;
         display:flex;
         flex-direction: row;
+        justify-content: center;
 
     }
     .arrow_red{
@@ -328,9 +330,7 @@ p {
     .check{
         width: 60px;
         height: auto;
-        z-index: 2;
-        margin-right: 0px;
-
+        z-index: 1;
     }
     .return-button {
         padding:0.8rem 1rem;
@@ -344,9 +344,7 @@ p {
         margin-left: 0px;
         width: 10rem;
     }
-    .score-display{
-        float:right;
-    }
+
 
     .product-box {
         display: flex;
@@ -359,11 +357,6 @@ p {
 
     .product-box img{
         max-width:100px
-    }
-
-    .arrow_red {
-        height: 60px;
-        width: 60px;
     }
 
     .meta {
