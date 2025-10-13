@@ -45,7 +45,8 @@ def scraper(driver:webdriver.Chrome):
                     image_url = product_image.get_attribute("data-src")
                 alt_image = product_image.get_attribute("alt")
                 
-                high_quality_img_url = hqi.get_high_quality_link(image_url, alt_image)
+                # ... 💀
+                high_quality_img_url = hqi.even_better_and_stupidly_simple_img_link(image_url, alt_image)
 
                 data = {
                     "brand": product_brand.text.strip(),
