@@ -5,16 +5,18 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import time
+import yaml
 
 import high_quality_img as hqi
 import helper_functions as helper
 
-def scraper(driver:webdriver.Chrome):
+def scraper(x_paths:dict, driver:webdriver.Chrome):
     """
     Scraped die gerade geladene Seite <br>
     Kann nicht eine komplette Seite scannen, da diese automatisch generiert wird und nicht preloaded ist. <br>
     """
     scraped_data = []
+    successful_products = 0
 
     try:
         articles = WebDriverWait(driver, 10).until(
@@ -23,21 +25,15 @@ def scraper(driver:webdriver.Chrome):
 
         for article in articles:
             try:
-                list_item = article.find_element(By.CSS_SELECTOR, "li.find_tile")
+                product_brand = article.find_element(By.XPATH, x_paths["brand"])
+                product_name = article.find_element(By.XPATH, x_paths["name"])
+                product_link = article.find_element(By.XPATH, x_paths["link"])
 
-                product_brand = list_item.find_element(By.CLASS_NAME, "find_tile__brand")
-
-                product_name = list_item.find_element(By.CLASS_NAME, "find_tile__name")
-
-                product_link = list_item.find_element(By.CLASS_NAME, "find_tile__productLink")
-
-                #get the price by the right tag
-                try:
-                    product_price = list_item.find_element(By.CSS_SELECTOR, ".find_tile__priceValue--strikethrough")
+                try: #get the price by the right tag
+                    product_price = article.find_element(By.XPATH, x_paths["original_price"])
                 except NoSuchElementException:
-                    product_price = list_item.find_element(By.CSS_SELECTOR, ".find_tile__priceValue")
-
-                product_image = list_item.find_element(By.CSS_SELECTOR, "div.find_tile__productImageContainer picture img.find_tile__productImage")
+                    product_price = article.find_element(By.XPATH, x_paths["price"])
+                product_image = article.find_element(By.XPATH, x_paths["img"])
 
                 #get the right image url and generate the high quality link
                 image_url = product_image.get_attribute("src")
@@ -46,7 +42,7 @@ def scraper(driver:webdriver.Chrome):
                 alt_image = product_image.get_attribute("alt")
                 
                 # ... 💀
-                high_quality_img_url = hqi.even_better_and_stupidly_simple_img_link(image_url, alt_image)
+                high_quality_img_url = hqi.even_better_and_stupidly_simple_img_link(image_url)
 
                 data = {
                     "brand": product_brand.text.strip(),
@@ -58,6 +54,9 @@ def scraper(driver:webdriver.Chrome):
                     "link": product_link.get_attribute("href"),
                 }
                 scraped_data.append(data)
+                
+                successful_products += 1
+                print(f"\033[F Succesfully collected: {successful_products} products!" )
 
             except NoSuchElementException:
                 #print("Some elements not found in this article, skipping...")
@@ -69,7 +68,7 @@ def scraper(driver:webdriver.Chrome):
     return scraped_data
 
 
-def scrape_full_page(url:str, driver:webdriver.Chrome):
+def scrape_category(url:str, x_paths:dict, driver:webdriver.Chrome):
     """
     Scraped eine komplette Seite indem sie sie durchscrollt
     """
@@ -82,17 +81,19 @@ def scrape_full_page(url:str, driver:webdriver.Chrome):
     current_height = 0
     product_data = []
 
-    #scroll through the page and scrape currently loaded products
+
+    #scroll through the page and scrape loaded products
+    step_size_px = 500
     while current_height < max_height:  
-        current_height += 4500
+        current_height += step_size_px
         percentage = min(100, int((current_height / max_height) * 100))
         driver.execute_script(f"window.scrollTo(0, {current_height});")
-        print(f"\033[FProgress: {percentage}% of category!" )
+        time.sleep(.05) # give page some time to load on each step, could prob be optimized
+        print(f"\033[F Loaded: {percentage}% of page!" )
 
-        product_data.extend(scraper(driver))
-
-
-    product_data = helper.remove_duplicates(product_data)
+    print("Collecting Data...\n")
+    product_data.extend(scraper(x_paths=x_paths, driver=driver))
+    product_data = helper.remove_duplicates(product_data) # might be unnecessary
 
     #Debugging    
     #for item in product_data:
@@ -104,7 +105,7 @@ def scrape_full_page(url:str, driver:webdriver.Chrome):
 
 #---Main execute---#
 
-def scrape_main(search_terms:list, export_path:str='articles.json', await_debug:bool=False):
+def scrape_main(search_terms:list, x_paths:dict, export_path:str='articles.json', await_debug:bool=False):
     """
     Scraped die gegebenen Suchterme und gibt eine JSON mit folgenden Produktdaten aus:
     - Name ("name")
@@ -126,7 +127,9 @@ def scrape_main(search_terms:list, export_path:str='articles.json', await_debug:
 
     #Search and scrape each category
     for search_term in search_terms:
-        products = scrape_full_page(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", driver)
+        products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver)
+        print(f"Collected {len(products)} products!")
+        print("---------------------------------------------------------")
         category_dict[search_term] = products
 
     #Export data to JSON
@@ -140,7 +143,29 @@ def scrape_main(search_terms:list, export_path:str='articles.json', await_debug:
 
     driver.quit()
     
+def load_config(yaml_file:str):
+    try:
+        with open(yaml_file, 'r') as f:
+            data = yaml.safe_load(f)
+
+        # get config data by paramater
+        categories = data.get('categories')
+        x_paths = data.get('paths')
+
+        if categories:
+            return categories, x_paths
+        else:
+            print("Error: 'categories' not found in YAML file.")
+
+    except FileNotFoundError:
+        print(f"Error: File '{yaml_file}' not found.")
+    except yaml.YAMLError as e:
+        print(f"Error parsing YAML file: {e}")
+
 if __name__ == "__main__":
-    #categories = ["multimedia", "hello kitty", "moebel","haushalt", "bekleidung", "sport", "gartengeraete", "kostueme", "kleidung", "haustier kostueme", "haustier accessoires", "geraet", "bau", "beauty", "kind", "utensilien", "pc accessoires"]
-    categories = ["kostueme"]
-    scrape_main(search_terms = categories, export_path='articles.json', await_debug=False)
+    
+    yaml_file = "scraper_config.yaml"
+
+    categories, x_paths = load_config(yaml_file)
+    
+    scrape_main(search_terms = categories, x_paths=x_paths, export_path='articles.json', await_debug=False)
