@@ -1,6 +1,37 @@
-:root{
+[data-theme="light"]{
     --otto-red: #eb001f;
+    --center-container: #ffffff;
+    --text: #000000;
+    --table-element: #eaeaea;
+    --background: #e6e6e6;
+
+    --button: #eb001f;
+    --button-hover: #dc001d;
+
+    --username: #eaeaea;
+    --username-hover: #fff;
+        
+    --inversion: invert(.1)
 }
+
+[data-theme="dark"] {
+    --otto-red: #eb001f;
+    --center-container: rgb(38, 39, 43);
+    --text: #ddd9d9;
+    --table-element: #363636;
+    --background: #1d1d23;
+
+    --button: #c4152c;
+    --button-hover: #d52f45;
+
+    --username: #464646;
+    --username-text: #a4a4a4;
+    --username-hover: #a4a4a4;
+    --username-hover-text: #464646;
+
+    --inversion: invert(.9)
+}
+
 
 html {
     overflow: hidden;
@@ -11,6 +42,11 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: var(--background);
+}
+
+body {
+    background-color: var(--background);
 }
 
 @media only screen and (max-width: 600px) {
@@ -19,11 +55,18 @@ main {
   }
 }
 
+.index-main {
+    background-color: var(--background);
+    transition: 300ms ease-in-out;
+}
+
 .index-body {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 90vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 90vh;
+    background-color: var(--background);
+    transition: 300ms ease-in-out;
 }
 
 .index-container {
@@ -31,10 +74,12 @@ main {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #ffffff;
+    background-color: var(--center-container);
     padding-bottom: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 6px  6px rgba(0, 0, 0, 0.055);
+    color: var(--text);
+    transition: 200ms ease-in-out;
 }
 
 .streak-container {
@@ -53,18 +98,19 @@ main {
     margin-top:2vh;
     font-size: 1.2em;
     font-weight: 700;
-    background-color: var(--otto-red);
+    background-color: var(--button);
     color: white;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
-    transition-duration: 100ms;
+    transition: 300ms ease-in-out;
     min-width: 250px;
     max-width: 500px;
+    
 }
 
 .start-game-button:hover {
-    background-color: #b80018;
+    background-color: var(--button-hover);
 }
 
 .start-game-form {
@@ -77,19 +123,22 @@ main {
     padding: 15px 30px;
     font-size: 1em;
     background: url("/static/images/edit.svg") no-repeat scroll 97% 12px;
-    background-color: #eaeaea;
+    background-color: var(--username);
+    color: var(--username-text);
     border: none;
     border-radius: 100px;
     margin: 15px;
     width: 35vw;
     min-width:fit-content;
     max-width: 600px;
+    transition: 200ms ease-in-out;
     
 }
 
 .username-input:focus {
     outline: 2px solid #000000;
-    background-color: #ffffff;
+    background-color: var(--username-hover);
+    color: #464646;
 }
 
 
@@ -98,11 +147,12 @@ main {
     justify-content: space-between;
     padding: 5px 20px;
     margin: 1vh;
-    background-color: #eaeaea;
+    background-color: var(--table-element);
     border-radius: 10px;
     width: 25vw;
     min-width: 200px;
     max-width: 600px;
+    transition: 200ms ease-in-out;
 }
 
 .leaderboard-element-player{
@@ -111,11 +161,12 @@ main {
     padding: 5px 20px;
     margin-inline: 1vh;
     margin-top: 30px;
-    background-color: #e6e6e6;
+    background-color: var(--table-element);
     border-radius: 10px;
     width: 25vw;
     min-width: 200px;
     max-width: 600px;
+    transition: 200ms ease-in-out;
 }
 
 .leaderboard-element span{
@@ -176,7 +227,6 @@ main {
     border-radius: 10px 10px 0 0;
 }
 
-/* Visuell verbergen, aber für Screenreader und Fokus erhalten */
 .difficulty input {
     position: absolute;
     width: 1px;
@@ -189,7 +239,6 @@ main {
     border: 0;
 }
 
-/* Der sichtbare "Kachel"-Look */
 .label-text {
     display: block;
     padding: 15px;
@@ -214,13 +263,16 @@ main {
 
 /* Aktiver Zustand (einfacher, kein Animationseffekt) */
 .difficulty input:checked + .label-text {
-    background-color: white;
+    background-color: var(--center-container);
+    color: var(--text);
     box-shadow: inset 0px 0px 0px -0px black;
+    transition: 200ms ease-in-out;
 }
 
 .difficulty:has(input:checked) + .difficulty .label-text {
     border-bottom-left-radius: 10px;
     box-shadow: inset 8px -8px 6px -6px rgba(0, 0, 0, 0.29);
+    transition: none;
 }
 
 .difficulty:has(+ .difficulty input:checked) .label-text {
@@ -230,4 +282,49 @@ main {
 
 .hidden {
     display: none;
+}
+
+footer {
+    transition: 200ms;
+    background-color: var(--background);
+}
+
+.footer-button {
+    position: fixed;
+    background-color: var(--center-container);
+    border: none;
+    bottom: 3vh;
+    right: 3vh;
+   width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: block;
+    z-index: 99999;
+    transition: 200ms ease-in-out;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.046)
+}
+
+.footer-button:hover{
+    scale: 1.05;
+}
+.footer-button:active{
+    scale: 1;
+}
+
+.footer-button:active .mode-img{
+    scale: .5;
+    rotate: 60deg;
+}
+
+.mode-img {
+    align-items: center;
+    justify-content: center;
+    margin-top: 3px;
+    margin-left: 2px;
+    width: 25px;
+    height:25px;
+    transition: 500ms;
+    filter: var(--inversion)
 }

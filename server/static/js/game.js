@@ -18,6 +18,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
     setup();
 });
 
+localTheme = getPreferredTheme()
+console.log(localTheme)
+document.documentElement.setAttribute('data-theme', localTheme);
+
+
+
 async function send_guess() {
     //console.log(this.getAttribute('user_guess'))
     await fetch("/guess", {
@@ -227,4 +233,17 @@ function getOffset(el) {
     x: rect.left + window.scrollX,
     y: rect.top + window.scrollY
   };
+}
+
+function getPreferredTheme() {
+    if(localStorage.getItem("theme")){
+        return localStorage.getItem("theme")
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        localStorage.setItem("theme", "dark")
+        return 'dark';
+    } else {
+        localStorage.setItem("theme", "light")
+        return 'light';
+    }
 }

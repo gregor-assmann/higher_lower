@@ -67,7 +67,6 @@ def scraper(x_paths:dict, driver:webdriver.Chrome):
 
     return scraped_data
 
-
 def scrape_category(url:str, x_paths:dict, driver:webdriver.Chrome):
     """
     Scraped eine komplette Seite indem sie sie durchscrollt
@@ -102,9 +101,6 @@ def scrape_category(url:str, x_paths:dict, driver:webdriver.Chrome):
 
     return product_data
 
-
-#---Main execute---#
-
 def scrape_main(search_terms:list, x_paths:dict, export_path:str='articles.json', await_debug:bool=False):
     """
     Scraped die gegebenen Suchterme und gibt eine JSON mit folgenden Produktdaten aus:
@@ -128,7 +124,7 @@ def scrape_main(search_terms:list, x_paths:dict, export_path:str='articles.json'
     #Search and scrape each category
     for search_term in search_terms:
         products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver)
-        print(f"Collected {len(products)} products!")
+        print(f"Collected {len(products)} unique products!")
         print("---------------------------------------------------------")
         category_dict[search_term] = products
 

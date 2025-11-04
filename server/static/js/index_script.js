@@ -23,3 +23,43 @@ function show_selected_board() {
         }
     });
 }
+
+function getPreferredTheme() {
+    if(localStorage.getItem("theme")){
+        console.log("from storage")
+        return localStorage.getItem("theme")
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        localStorage.setItem("theme", "dark")
+        console.log("from system")
+        return 'dark';
+    } else {
+        localStorage.setItem("theme", "light")
+        return 'light';
+    }
+}
+
+localTheme = getPreferredTheme()
+console.log(localTheme)
+document.documentElement.setAttribute('data-theme', localTheme);
+document.addEventListener("DOMContentLoaded", (event) => {
+    document.querySelector(".mode-img").src = "static/images/" + localTheme + "-mode.png"
+});
+
+
+
+function toggleTheme(){
+    
+    currentTheme = localStorage.getItem("theme")
+
+    if(currentTheme == "dark"){
+        localStorage.setItem("theme", "light")
+        document.querySelector(".mode-img").src = "static/images/light-mode.png"
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        localStorage.setItem("theme", "dark")
+        document.querySelector(".mode-img").src = "static/images/dark-mode.png"
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+}

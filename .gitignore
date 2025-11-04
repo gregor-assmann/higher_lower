@@ -11,6 +11,7 @@ scraper/.venv
 # VsCode settings
 server/.vscode/
 server/__pycache__
+server/DB/
 
 
 #Python test file for db
