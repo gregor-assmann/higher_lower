@@ -1,0 +1,17 @@
+scraper/__pycache__/
+scraper/*.py[oc]
+scraper/build/
+scraper/dist/
+scraper/wheels/
+scraper/*.egg-info
+
+.venv
+
+server/.vscode/
+server/__pycache__
+
+
+#Python test file for db
+test.py
+
+.vscode/
