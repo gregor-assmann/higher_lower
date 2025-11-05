@@ -1,16 +1,18 @@
 import json
 from os import path
 import random
+import logger
 
+LOGGER = logger.Logger
 
 
 class Difficulty:
     def __init__(self, threshold = 1.2, base = 0.05, absolute = 120, relative = 1.0, relation_base = 0.2):
         self.threshold = threshold
-        self.base = base
-        self.absolute = absolute
-        self.relative = relative
-        self.relation_base = relation_base
+        self.base = base # base probability for a product
+        self.absolute = absolute # larger -> favors larger absolute gaps
+        self.relative = relative # larger -> favors larger relative gaps
+        self.relation_base = relation_base # maximum difference in relation, higher -> higher max probability
 
 Difficulty.normal = Difficulty(1.2, 0.05, 120, 1, 0.2)
 Difficulty.hard = Difficulty(1.1, 0.03, 80, 1.5, 0.25)
@@ -26,21 +28,28 @@ class Product:
         self.alt = alt
         self.link = link
 
-    # Calculates how similar in price products are
+
     def get_product_relation(self, other, difficulty: Difficulty = Difficulty.normal):
+        """
+        Calculates how similar in price products are based on the `difficulty`
+        """
         if self.price * difficulty.threshold >= other.price >= self.price / difficulty.threshold: return 0
         return difficulty.base + self.__class__.absolute_relation(self.price - other.price, difficulty.absolute) + self.__class__.relative_relation(self.price/other.price, difficulty.relative)
 
-    # Based on the absolute price difference
     @staticmethod
     def absolute_relation(delta_price, modifier = Difficulty.normal.absolute, relation_base = Difficulty.normal.relation_base):
-        # At most 0.2
+        """
+        Calculates the absolute relation based on the absolute price difference and `difficulty`
+        """
+        # At most relation_base
         return max(0, relation_base - abs(delta_price)/modifier)
 
-    # Based on the relative price ratio
     @staticmethod
     def relative_relation(price_ratio, modifier = Difficulty.normal.relative, relation_base = Difficulty.normal.relation_base):
-        # At most 0.2
+        """
+        Calculates the relative relation based on the price ratio and `difficulty`
+        """
+        # At most relation_base
         return max(0, -0.5*((((price_ratio if price_ratio > 1 else 1/price_ratio) - 1) * modifier)**2) + relation_base)
 
     def __repr__(self):
@@ -59,7 +68,13 @@ class ProductCollection:
             self.products = products
 
     def load_products(self, file_path):
+
+        """
+        Loads Products from JSON as one large list and converts them to Product objects
+        """
+
         with open(file_path, encoding='utf-8') as f:
+            LOGGER.load("Products", "Products loaded")
             categories = json.load(f)
             products = None
             if self.category is None:
@@ -71,12 +86,17 @@ class ProductCollection:
             self.products = [Product(**product) for product in products]
 
     def next_product(self, last_product: Product | int | None = None, difficulty: Difficulty = Difficulty.normal) -> Product:
+
+        """
+        Loads the next product randomly, based on the previous product if provided.
+        """
+
         if last_product is None:
             return random.choice(self.products)
         if isinstance(last_product, int):
             last_product = self[last_product]
         # Shuffles the product list
-        products = random.sample(self.products, len(self.products))
+        products = random.sample(self.products, len(self.products)) # doesnt use shuffle to return a new list
         products.remove(last_product)
         for product in products[:-1]:
             # Uses the product price similarity to randomly get the next product, becoming more probable the more similar the products are

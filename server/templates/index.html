@@ -56,7 +56,7 @@
             {%endif%}
                
             <form id="start-game-form" method="POST" action="/new_game" class="start-game-form">
-                <input name="username" type="text" class="username-input" placeholder="Gib deinen Namen ein" value={{leaderBoardData["own_name"]}}>
+                <input name="username" type="text" class="username-input" placeholder="Gib deinen Namen ein" value={{(leaderBoardData["own_name"])}}>
                 <input type="submit" value="Neues Spiel" class="start-game-button"/>
             </form>
             

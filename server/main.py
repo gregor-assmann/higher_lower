@@ -1,102 +1,58 @@
-from next_product_getter import Product, ProductCollection, Difficulty
 from threading import Lock
 import uuid
 from flask import Flask, jsonify, session, redirect, url_for, request, render_template
-import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from pathlib import Path
+import logging
+
 from db import leaderBoard
-from randomgenerator import generate_nickname, generate_parceltime
+from randomgenerator import generate_nickname
+from game import Game
+from logger import Logger
 
 dirname = str(Path(__file__).parent.parent)
-
-class Game:
-   def __init__(self, difficulty, article_file_path = None):
-      self.score = 0
-      self.difficulty = difficulty
-      self.collection = ProductCollection((dirname + r'/scraper/articles.json') if article_file_path is None else article_file_path)
-      
-      self.productLast = self.collection.next_product()
-      self.productNext = self.collection.next_product()
-
-      self.LastParcelTime = generate_parceltime()
-      self.NextParcelTime = generate_parceltime()
-
-      self.nextProduct()
-
-      self.gameOver = False
-      self.expiresAt = datetime.datetime.now() + datetime.timedelta(minutes=5) # game expires in 30 minutes
-   
-   def expired(self):
-      return datetime.datetime.now() > self.expiresAt
-   
-   def extend_time(self, minutes=5):
-      self.expiresAt = datetime.datetime.now() + datetime.timedelta(minutes=minutes)
-
-   def nextProduct(self):
-      diff = Difficulty()
-      if self.difficulty == "normal" : diff = diff.normal
-      if self.difficulty == "hard"   : diff = diff.hard
-      if self.difficulty == "extreme": diff = diff.extreme
-
-      print(diff.base)
-
-      self.productLast = self.productNext
-      self.productNext = self.collection.next_product(self.productLast, difficulty=diff)
-
-      self.LastParcelTime = self.NextParcelTime
-      self.NextParcelTime = generate_parceltime()
-   
-   def checkGuess(self, userGuess):
-      self.extend_time()
-
-      rightGuess = ""
-      if (self.productNext.price > self.productLast.price):
-         rightGuess = "higher"
-      elif (self.productNext.price < self.productLast.price):
-         rightGuess = "lower"
-      else: 
-         return True # if prices are equal always correct
-      if userGuess == rightGuess:
-         return True
-   
-   def toDict(self, CensorNextPrice = True):
-      return {
-         "score": self.score,
-         "productLast_brand": self.productLast.brand,
-         "productLast_price": self.productLast.price,
-         "productLast_link": self.productLast.link,
-         "productLast_name": self.productLast.name,
-         "productLast_img": self.productLast.img,
-         "productLast_high_q_img": self.productLast.high_q_img,
-         "productLast_parcel_time": self.LastParcelTime,
-
-         "productNext_brand": self.productNext.brand,
-         "productNext_price": self.productNext.price if not CensorNextPrice else "???",
-         "productNext_link": self.productNext.link if not CensorNextPrice else None,
-         "productNext_name": self.productNext.name,
-         "productNext_img": self.productNext.img,
-         "productNext_high_q_img": self.productNext.high_q_img,
-         "productNext_parcel_time": self.NextParcelTime,
-      }
 
 games = {}
 games_lock = Lock() # to prevent simultaneous access to games dict from cleanup and main thread
 
 leaderBoard = leaderBoard(dirname + r'/server/DB/leaderboard.db')
 
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+LOGGER = Logger
+
+port=5000
+LOGGER.log("Server", f"Server Running on port={port}")
+
+
 def cleanup_games():
+   
+   """
+   Cleans up expired games.
+   """
+
    with games_lock:
       for game in list(games.items()):
          if game[1].expired():
+            LOGGER.log("Game", "Game has expired.")
             games.pop(game[0], None)
          
 
 app = Flask(__name__)
 app.secret_key = "jalkdfekllypkekdkdpqwpeioxyvenljjlkjnsnvnasvnela"
 
+
 @app.route("/")
 def index():
+   
+   """
+   #### Index/Home Route 
+
+   Handles updating the Leaderboard after finishing a game. <br>
+   Serves the Index Html.
+
+   """
+
    sesssionID = session.get('sessionID')
    if sesssionID is None:
      session['sessionID'] = uuid.uuid4()
@@ -109,22 +65,21 @@ def index():
       #leaderboard logic
       if not firstgame: #leaderboard update
          currentgame = games[session['sessionID']]
-         leaderBoard.add_score(currentgame.difficulty, session.get('name'), lastScore)
+         leaderBoard.add_score(currentgame.difficulty, session.get('name'), lastScore) # add last games score to database after loss
+         LOGGER.success("Leaderboard", f"Updated: Difficulty:{currentgame.difficulty}, Name:{session.get('name')}, Score:{lastScore}")
 
       leaderBoardData = leaderBoard.get_top_scores_dict("all", 5) # get all leaderboards from leaderboard.db
 
       if not firstgame: # adding own score and name to leaderboard data if not first game
          difficulty = games[session['sessionID']].difficulty
-
          leaderBoardData["own_name"] = session.get('name')
          leaderBoardData["own_score"] = lastScore
          leaderBoardData["own_difficulty"] = difficulty
          leaderBoardData["own_position"] = leaderBoard.get_position(difficulty, lastScore)
 
+        # config for difficulty selector
       difficulties = ["normal", "hard", "extreme"]
       difficulty_names = ["Normal", "Hard", "Extrem"]
-
-      print(leaderBoardData)
 
       games.pop(session['sessionID'], None) # remove old game if exists
       return render_template("index.html", firstGame = firstgame, difficulties=difficulties, difficulty_names=difficulty_names, leaderBoardData=leaderBoardData)
@@ -132,7 +87,17 @@ def index():
 
 @app.route("/new_game", methods = ["POST"])
 def new_game():
+   
+   """
+   #### Post-Endpoint for creating a new game
+
+   Handles setting the username (also random generation) and difficulty <br>
+   Handles the adding of the new game to the games dictionary.
+   
+   """
+
    if session["sessionID"] is None:
+      LOGGER.failure("New Game", "Invalid Session ID")
       return redirect(url_for("index"))
    else:  
       #set player name
@@ -141,28 +106,50 @@ def new_game():
 
       #set game difficulty
       difficulty = request.form["difficulty"]
-      print(difficulty)
-
       #create new game and add to list of games: games
       game = Game(difficulty=difficulty)
-      with games_lock: games[session['sessionID']] = game   
-     
+      with games_lock: games[session['sessionID']] = game
+
+      LOGGER.success("New Game", f"Name: {session["name"]}, Difficulty: {difficulty}, SessionID: {session["sessionID"]}")   
+    
       return redirect(url_for('game'))
 
 
 @app.route("/game")
 def game():
+   
+   """
+   #### Game Route
+
+   Serves the Game Html<br>
+   Redirects the user if he reloads the page after losing
+   """
+
    with games_lock:
       if "sessionID" not in session or session['sessionID'] not in games:
+         LOGGER.failure("Game", "Invalid Session or sessionID")
          return redirect(url_for('index'))
       else:
          currentGame = games[session['sessionID']]
          if currentGame.gameOver:
+            LOGGER.log("Game", "Redirecting GameOver on Reload")
             return redirect(url_for('index'))
          return render_template("game.html", **currentGame.toDict(True))
 
+
 @app.route("/guess", methods = ['POST'])
 def guess():
+   
+   """
+   #### Post-Endpoint for submiting a guess
+
+   Handles guess logic and returns new products after each guess.<br>
+   Redirects if accessed without a valid session or after the game is over.
+
+   """
+
+   LOGGER.request("Guess", "Guess Submitted", "POST")
+
    with games_lock:
       #Check if session and game exist
       if "sessionID" not in session or session['sessionID'] not in games:
@@ -177,7 +164,6 @@ def guess():
          dict = currentGame.toDict(True)
          #get user guess from form
          if guessed_correctly: # if correct guess deliver new product
-            print("Guessed correctly")
             currentGame.score += 1            
             dict['correct'] = True
             return jsonify(dict) # censor next price
@@ -188,12 +174,18 @@ def guess():
 
 @app.route("/test")
 def test():
+   """
+   Debugging to test sessions
+   """
    name = session["name"]
    return name
-   
+
+# Garbage collection to clean expired games each minute, seperate Thread
 sheduler = BackgroundScheduler()
 sheduler.add_job(func=cleanup_games, trigger="interval", minutes=1)
 sheduler.start()
 
+
 if __name__ == '__main__':
    app.run(debug = True)
+   

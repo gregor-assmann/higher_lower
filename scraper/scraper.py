@@ -10,6 +10,7 @@ import yaml
 import high_quality_img as hqi
 import helper_functions as helper
 
+
 def scraper(x_paths:dict, driver:webdriver.Chrome):
     """
     Scraped die gerade geladene Seite <br>
@@ -58,12 +59,12 @@ def scraper(x_paths:dict, driver:webdriver.Chrome):
                 successful_products += 1
                 print(f"\033[F Succesfully collected: {successful_products} products!" )
 
-            except NoSuchElementException:
-                #print("Some elements not found in this article, skipping...")
+            except NoSuchElementException as e:
                 pass
 
     except TimeoutException:
-        print("Timed out waiting for products to load.")
+        print("Timed out whilst trying to load articles.")
+        pass
 
     return scraped_data
 
@@ -151,12 +152,12 @@ def load_config(yaml_file:str):
         if categories:
             return categories, x_paths
         else:
-            print("Error: 'categories' not found in YAML file.")
+            print("Config", "No 'categories' in config-file")
 
     except FileNotFoundError:
-        print(f"Error: File '{yaml_file}' not found.")
+        print("File", f"File '{yaml_file}' not found.")
     except yaml.YAMLError as e:
-        print(f"Error parsing YAML file: {e}")
+        print("Yaml", f"Failed parsing Yaml File", e)
 
 if __name__ == "__main__":
     
