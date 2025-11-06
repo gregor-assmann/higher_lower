@@ -78,11 +78,11 @@ class ProductCollection:
     def __init__(self, config_path, file_path = None, *, category = None, products = None):
         self.products = None
         self.category = category
+        self.db_uri = load_config(config_path)
         if products is None:
             if not file_path is None: self.load_products(file_path)
         else:
             self.products = products
-        self.db_uri = load_config(config_path)
 
     def load_products(self, file_path):
 
@@ -102,7 +102,6 @@ class ProductCollection:
         # Unpacks the product dictionary into the Product class constructor"""
             
         
-        print(self.db_uri)
         client = MongoClient(self.db_uri, server_api=ServerApi('1'))
         db_handler = database_handler.DatabaseHandler(client)
         db_handler.test_connection()
