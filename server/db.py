@@ -1,7 +1,7 @@
 import sqlite3
 import logger
 
-LOGGER = logger.Logger
+LOGGER =  logger.Logger
 
 class leaderBoard:
     def __init__(self, dbPath):

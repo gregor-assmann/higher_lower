@@ -30,7 +30,7 @@ class Logger:
         __class__.__construct_log(colorise(colors.OKGREEN, "SUCCESS"), location=location, message=message)
 
     def error(location:str, message:str, error_message:str=""):
-        __class__.__construct_log(colorise(colors.FAIL, "ERROR"), location=location, message=(message + (f" => {error_message}" if error_message!="" else "")))
+        __class__.__construct_log(colorise(colors.FAIL, "ERROR"), location=location, message=(message + "\n" + (f" => {error_message}" if error_message!="" else "")))
 
     def failure(location:str, message:str):
         __class__.__construct_log(colorise(colors.WARNING, "FAILURE"), location=location, message=message)

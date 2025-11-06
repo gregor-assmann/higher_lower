@@ -7,11 +7,15 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import time
 import yaml
 
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
 import high_quality_img as hqi
 import helper_functions as helper
+import database_handler as db_handler
 
 
-def scraper(x_paths:dict, driver:webdriver.Chrome):
+def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
     """
     Scraped die gerade geladene Seite <br>
     Kann nicht eine komplette Seite scannen, da diese automatisch generiert wird und nicht preloaded ist. <br>
@@ -53,11 +57,12 @@ def scraper(x_paths:dict, driver:webdriver.Chrome):
                     "high_q_img": high_quality_img_url,
                     "alt": alt_image,
                     "link": product_link.get_attribute("href"),
+                    "category": category,
                 }
                 scraped_data.append(data)
                 
                 successful_products += 1
-                print(f"\033[F Succesfully collected: {successful_products} products!" )
+                print(f"\033[FSuccesfully collected: {successful_products} products!" )
 
             except NoSuchElementException as e:
                 pass
@@ -68,11 +73,11 @@ def scraper(x_paths:dict, driver:webdriver.Chrome):
 
     return scraped_data
 
-def scrape_category(url:str, x_paths:dict, driver:webdriver.Chrome):
+def scrape_category(url:str, x_paths:dict, db_uri:str, category:str, driver:webdriver.Chrome):
     """
     Scraped eine komplette Seite indem sie sie durchscrollt
     """
-    
+
     print(f"Scraping {url}\n")
 
     #Setup parameters
@@ -89,10 +94,10 @@ def scrape_category(url:str, x_paths:dict, driver:webdriver.Chrome):
         percentage = min(100, int((current_height / max_height) * 100))
         driver.execute_script(f"window.scrollTo(0, {current_height});")
         time.sleep(.05) # give page some time to load on each step, could prob be optimized
-        print(f"\033[F Loaded: {percentage}% of page!" )
+        print(f"\033[FLoaded: {percentage}% of page!" )
 
     print("Collecting Data...\n")
-    product_data.extend(scraper(x_paths=x_paths, driver=driver))
+    product_data.extend(scraper(x_paths=x_paths, driver=driver, category = category))
     product_data = helper.remove_duplicates(product_data) # might be unnecessary
 
     #Debugging    
@@ -102,7 +107,7 @@ def scrape_category(url:str, x_paths:dict, driver:webdriver.Chrome):
 
     return product_data
 
-def scrape_main(search_terms:list, x_paths:dict, export_path:str='articles.json', await_debug:bool=False):
+def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='articles.json', await_debug:bool=False):
     """
     Scraped die gegebenen Suchterme und gibt eine JSON mit folgenden Produktdaten aus:
     - Name ("name")
@@ -112,6 +117,9 @@ def scrape_main(search_terms:list, x_paths:dict, export_path:str='articles.json'
     - Link (zu Produkt)
     """
 
+    client = MongoClient(db_uri, server_api=ServerApi('1'))
+    database_handler = db_handler.DatabaseHandler(client)
+    database_handler.test_connection()
     category_dict = {}
 
     #Setup WebDriver
@@ -124,9 +132,13 @@ def scrape_main(search_terms:list, x_paths:dict, export_path:str='articles.json'
 
     #Search and scrape each category
     for search_term in search_terms:
-        products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver)
+        products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver, db_uri=db_uri, category = search_term)
         print(f"Collected {len(products)} unique products!")
         print("---------------------------------------------------------")
+        
+        # Handle Data storage
+        database_handler.delete_category(category=search_term)
+        database_handler.write_category(products)
         category_dict[search_term] = products
 
     #Export data to JSON
@@ -149,8 +161,13 @@ def load_config(yaml_file:str):
         categories = data.get('categories')
         x_paths = data.get('paths')
 
+        db_link = data.get('db')["link"]
+        db_password = data.get('db')["password"]
+
+        db_uri = db_link.replace("<Password>", db_password)
+
         if categories:
-            return categories, x_paths
+            return categories, x_paths, db_uri
         else:
             print("Config", "No 'categories' in config-file")
 
@@ -163,6 +180,6 @@ if __name__ == "__main__":
     
     yaml_file = "scraper_config.yaml"
 
-    categories, x_paths = load_config(yaml_file)
+    categories, x_paths, db_uri = load_config(yaml_file)
     
-    scrape_main(search_terms = categories, x_paths=x_paths, export_path='articles.json', await_debug=False)
+    scrape_main(search_terms = categories, x_paths=x_paths, db_uri=db_uri, export_path='articles.json', await_debug=False)

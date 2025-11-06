@@ -11,7 +11,7 @@ class Game:
    def __init__(self, difficulty, article_file_path = None):
       self.score = 0
       self.difficulty = difficulty
-      self.collection = ProductCollection((dirname + r'/scraper/articles.json') if article_file_path is None else article_file_path)
+      self.collection = ProductCollection(config_path="game_config.yaml" (dirname + r'/scraper/articles.json') if article_file_path is None else article_file_path)
       
       self.productLast = self.collection.next_product()
       self.productNext = self.collection.next_product()

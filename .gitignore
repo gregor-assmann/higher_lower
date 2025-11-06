@@ -5,6 +5,7 @@ scraper/build/
 scraper/dist/
 scraper/wheels/
 scraper/*.egg-info
+scraper/scraper_config.yaml
 
 # Virtual environments possibly generated in scraper
 scraper/.venv
