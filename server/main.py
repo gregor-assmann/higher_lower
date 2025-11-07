@@ -9,6 +9,7 @@ from db import leaderBoard
 from randomgenerator import generate_nickname
 from game import Game
 from logger import Logger
+import socket
 
 dirname = str(Path(__file__).parent.parent)
 
@@ -18,11 +19,13 @@ games_lock = Lock() # to prevent simultaneous access to games dict from cleanup 
 leaderBoard = leaderBoard(dirname + r'/server/DB/leaderboard.db')
 
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+#log.setLevel("ERROR")
+
 LOGGER = Logger
 
-port=5000
-LOGGER.log("Server", f"Server Running on port={port}")
+ipaddress = socket.gethostbyname(socket.gethostname())
+port=8000
+LOGGER.log("Server", f"Server Running on {ipaddress}:{8000}")
 
 
 def cleanup_games():
