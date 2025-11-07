@@ -6,7 +6,6 @@ scraper/dist/
 scraper/wheels/
 scraper/*.egg-info
 scraper/scraper_config.yaml
-scraper/scraper_config.yaml
 
 # VsCode settings
 server/.vscode/
