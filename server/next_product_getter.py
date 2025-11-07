@@ -1,7 +1,7 @@
 import json
 from os import path
 import random
-import logger
+import util.logger as logger
 import yaml
 
 from pymongo.mongo_client import MongoClient
@@ -13,7 +13,7 @@ current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root: higher_lower
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
-from scraper import database_handler
+from util import database_handler
 
 
 

@@ -12,7 +12,14 @@ from pymongo.server_api import ServerApi
 
 import high_quality_img as hqi
 import helper_functions as helper
-import database_handler as db_handler
+
+import sys
+import os
+current_dir = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root: higher_lower
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+from util import database_handler as db_handler
 
 
 def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
@@ -75,7 +82,9 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
 
 def scrape_category(url:str, x_paths:dict, db_uri:str, category:str, driver:webdriver.Chrome):
     """
-    Scraped eine komplette Seite indem sie sie durchscrollt
+    Scraped eine komplette Seite indem sie sie durchscrollt <br>
+
+    Gibt eine liste an Produkten zurück
     """
 
     print(f"Scraping {url}\n")
@@ -109,12 +118,13 @@ def scrape_category(url:str, x_paths:dict, db_uri:str, category:str, driver:webd
 
 def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='articles.json', await_debug:bool=False):
     """
-    Scraped die gegebenen Suchterme und gibt eine JSON mit folgenden Produktdaten aus:
+    Scraped die gegebenen Suchterme und speichert die Produkte auf MongoDB mit folgenden Werten: 
     - Name ("name")
     - Preis ("price")
     - original Bild ("img")
     - high-res Bild ("high_q_img")    
-    - Link (zu Produkt)
+    - Link (zu Produkt) ("link")
+    - Kategorie ("category")
     """
 
     client = MongoClient(db_uri, server_api=ServerApi('1'))
@@ -133,16 +143,16 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
     #Search and scrape each category
     for search_term in search_terms:
         products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver, db_uri=db_uri, category = search_term)
-        print(f"Collected {len(products)} unique products!")
-        print("---------------------------------------------------------")
-        
+        print(f"Collected {len(products)} unique products!")        
         # Handle Data storage
         database_handler.delete_category(category=search_term)
         database_handler.write_category(products)
         category_dict[search_term] = products
+        print("---------------------------------------------------------")
 
-    #Export data to JSON
-    helper.export_to_json(category_dict, export_path)
+    # Export data to JSON
+    # Left in in case its needed later
+    #helper.export_to_json(category_dict, export_path)
 
     #Print summary
     for category in category_dict:

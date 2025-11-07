@@ -12,9 +12,19 @@ class colors:
     UNDERLINE = '\033[4m'
     
 def colorise(color, text):
+        
+        """
+        Colors/styles a given text in a given color.
+        """
+
         return color + text + colors.ENDC
 
 class Logger:
+
+    """
+    Used to log events of a type at a location with a message. <br>
+    Colorcodes different logs for easy readability.
+    """
 
     @staticmethod
     def __construct_log(logtype:str, location:str, message:str):

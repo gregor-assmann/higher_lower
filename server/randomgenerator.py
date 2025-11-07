@@ -1,6 +1,16 @@
 import json
 import random
-import logger
+
+# Import from util is scuffed because making it a module or package didnt work
+import sys
+import os
+current_dir = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root: higher_lower
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+from util.logger import Logger
+from util import leaderboard_handler
+import util.logger as logger
 
 LOGGER = logger.Logger
 
