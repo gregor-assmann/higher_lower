@@ -42,6 +42,9 @@
 
     --username: #eaeaea;
     --username-hover: #fff;
+
+    --inversion: invert(.1)
+
 }
 
 [data-theme="dark"] {
@@ -58,6 +61,8 @@
     --username-text: #a4a4a4;
     --username-hover: #a4a4a4;
     --username-hover-text: #464646;
+    
+    --inversion: invert(.9)
 }
 
 body {

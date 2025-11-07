@@ -13,6 +13,7 @@ server/__pycache__
 server/DB/
 server/game_config.yaml
 
+util/__pycache__/
 
 #Python test file for db
 test.py
