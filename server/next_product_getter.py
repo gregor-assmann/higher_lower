@@ -147,7 +147,7 @@ def load_config(yaml_file:str):
         db_link = data.get('db')["link"]
         db_password = data.get('db')["password"]
 
-        if db_link.find("link to db") != -1 or db_password.find("link to db") != -1:
+        if db_link.find("link to db") != -1 or db_password.find("password to db") != -1:
            LOGGER.error("Yaml", "Please configure Database link and password!")
 
         db_uri = db_link.replace("<Password>", db_password)

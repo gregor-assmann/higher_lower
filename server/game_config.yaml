@@ -1,4 +1,3 @@
 db:
-    link: mongodb+srv://gregorassmann:<Password>@higherlower.ojazzfb.mongodb.net/?appName=HigherLower
-    password: Gregor.2007
-
+    link: link to db
+    password: password to db
