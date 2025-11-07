@@ -94,7 +94,6 @@ def index():
       difficulties = ["normal", "hard", "extreme"]
       difficulty_names = ["Normal", "Hard", "Extrem"]
 
-      print(leaderBoardData)
       games.pop(session['sessionID'], None) # remove old game if exists
       return render_template("index.html", firstGame = firstgame, difficulties=difficulties, difficulty_names=difficulty_names, leaderBoardData=leaderBoardData)
 

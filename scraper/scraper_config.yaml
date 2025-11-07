@@ -48,5 +48,6 @@ paths:
     price: .//li[contains(@class, 'find_tile')]//span[contains(@class,'find_tile__priceValue')]
     img: .//li[contains(@class, 'find_tile')]//img[contains(@class,'find_tile__productImage')]
 db:
-    link: link to db
-    password: password to db
+    link: mongodb+srv://gregorassmann:<Password>@higherlower.ojazzfb.mongodb.net/?appName=HigherLower
+    password: Gregor.2007
+
