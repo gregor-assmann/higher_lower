@@ -5,13 +5,14 @@ scraper/build/
 scraper/dist/
 scraper/wheels/
 scraper/*.egg-info
+scraper/scraper_config.yaml
 
-# Virtual environments possibly generated in scraper
-scraper/.venv
 # VsCode settings
 server/.vscode/
 server/__pycache__
 server/DB/
+server/game_config.yaml
+
 
 
 #Python test file for db

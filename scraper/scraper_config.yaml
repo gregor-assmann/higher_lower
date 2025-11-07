@@ -48,5 +48,5 @@ paths:
     price: .//li[contains(@class, 'find_tile')]//span[contains(@class,'find_tile__priceValue')]
     img: .//li[contains(@class, 'find_tile')]//img[contains(@class,'find_tile__productImage')]
 db:
-    link: "link to database"
-    password: "password to database"
+    link: "link/to/mongodb"
+    password: "password to mongodb"

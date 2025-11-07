@@ -1,9 +1,24 @@
 import json
 from os import path
 import random
-import logger
+import util.logger as logger
+import yaml
+
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+import sys
+import os
+current_dir = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root: higher_lower
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+from util import database_handler
+
+
 
 LOGGER = logger.Logger
+
 
 
 class Difficulty:
@@ -19,7 +34,7 @@ Difficulty.hard = Difficulty(1.1, 0.03, 80, 1.5, 0.25)
 Difficulty.extreme = Difficulty(1, 0, 60, 1.5, 0.25)
 
 class Product:
-    def __init__(self,brand, name, price, img, link = None, high_q_img = None, alt="product"):
+    def __init__(self,brand, name, price, img, category, link = None, high_q_img = None, alt="product"):
         self.brand = brand
         self.name = name
         self.price = float(price)
@@ -27,6 +42,7 @@ class Product:
         self.high_q_img = high_q_img
         self.alt = alt
         self.link = link
+        self.category = category
 
 
     def get_product_relation(self, other, difficulty: Difficulty = Difficulty.normal):
@@ -59,9 +75,10 @@ class Product:
         return f'{self.name}: {self.price}€'
 
 class ProductCollection:
-    def __init__(self, file_path = None, *, category = None, products = None):
+    def __init__(self, config_path, file_path = None, *, category = None, products = None):
         self.products = None
         self.category = category
+        self.db_uri = load_config(config_path)
         if products is None:
             if not file_path is None: self.load_products(file_path)
         else:
@@ -73,17 +90,26 @@ class ProductCollection:
         Loads Products from JSON as one large list and converts them to Product objects
         """
 
-        with open(file_path, encoding='utf-8') as f:
-            LOGGER.load("Products", "Products loaded")
-            categories = json.load(f)
-            products = None
-            if self.category is None:
-                # Adds together all products of all categories
-                products = [product for k, v in categories.items() for product in v]
-            else:
-                products = categories[self.category]
-            # Unpacks the product dictionary into the Product class constructor
-            self.products = [Product(**product) for product in products]
+        #with open(file_path, encoding='utf-8') as f:
+
+        """categories = json.load(f)
+        products = None
+        if self.category is None:
+            # Adds together all products of all categories
+            products = [product for k, v in categories.items() for product in v]
+        else:
+            products = categories[self.category]
+        # Unpacks the product dictionary into the Product class constructor"""
+            
+        
+        client = MongoClient(self.db_uri, server_api=ServerApi('1'))
+        db_handler = database_handler.DatabaseHandler(client)
+        db_handler.test_connection()
+
+        products = list(db_handler.get_all_entries())
+
+        LOGGER.load("Products", "Products loaded")
+        self.products = [Product(**product) for product in products]
 
     def next_product(self, last_product: Product | int | None = None, difficulty: Difficulty = Difficulty.normal) -> Product:
 
@@ -113,13 +139,31 @@ class ProductCollection:
     def __str__(self):
         return f'{self.__class__.__name__}{'[]' if self.products is None else [product for product in self.products]}'
 
+def load_config(yaml_file:str):
+    try:
+        with open(yaml_file, 'r') as f:
+            data = yaml.safe_load(f)
+
+        db_link = data.get('db')["link"]
+        db_password = data.get('db')["password"]
+
+        db_uri = db_link.replace("<Password>", db_password)
+
+        if db_uri:
+            return db_uri
+        else:
+            print("Config", "No 'categories' in config-file")
+
+    except FileNotFoundError:
+        print("File", f"File '{yaml_file}' not found.")
+    except yaml.YAMLError as e:
+        print("Yaml", f"Failed parsing Yaml File", e)
+
 def main():
-    catalog = ProductCollection(path.relpath('../scraper/articles.json'))
-    print(len(catalog))
-    categories = []
-    with open(path.relpath('../scraper/articles.json')) as f:
-        categories = json.load(f).keys()
-    print(sum([len(ProductCollection(path.relpath('../scraper/articles.json'), category=category)) for category in categories]))
+    prodcoll = ProductCollection(config_path="game_config.yaml")
+    prodcoll.load_products("some path")
+    for prod in prodcoll.products:
+        print(prod.name)
 
 if __name__ == '__main__':
     main()

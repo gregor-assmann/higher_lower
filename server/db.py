@@ -1,7 +1,27 @@
 import sqlite3
-import logger
 
-LOGGER = logger.Logger
+import sys
+import os
+current_dir = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root: higher_lower
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+import util.logger as logger
+
+LOGGER =  logger.Logger
+
+"""
+
+###############################################
+
+                    UNUSED
+
+Only as backup. Use leaderboard_handler instead.
+
+###############################################
+
+"""
+
 
 class leaderBoard:
     def __init__(self, dbPath):
@@ -48,7 +68,7 @@ class leaderBoard:
     def get_top_scores_dict(self, difficulty, limit=5):
         """
         Gets the top scores within a `limit`, for a `difficulty`. <br>
-        Returns as a `dictionary`
+        Returns as a `dictionary` 
         """
         difficulties = []
         if difficulty == "all": difficulties = ["normal","hard", "extreme"]

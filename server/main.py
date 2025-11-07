@@ -4,25 +4,38 @@ from flask import Flask, jsonify, session, redirect, url_for, request, render_te
 from apscheduler.schedulers.background import BackgroundScheduler
 from pathlib import Path
 import logging
+import socket
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+import yaml
 
-from db import leaderBoard
 from randomgenerator import generate_nickname
 from game import Game
-from logger import Logger
+
+# Import from util is scuffed because making it a module or package didnt work
+import sys
+import os
+current_dir = os.path.dirname(__file__)
+project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root: higher_lower
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+from util.logger import Logger
+from util import leaderboard_handler
+
 
 dirname = str(Path(__file__).parent.parent)
 
 games = {}
 games_lock = Lock() # to prevent simultaneous access to games dict from cleanup and main thread
 
-leaderBoard = leaderBoard(dirname + r'/server/DB/leaderboard.db')
-
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+#log.setLevel("ERROR")
+
 LOGGER = Logger
 
-port=5000
-LOGGER.log("Server", f"Server Running on port={port}")
+ipaddress = socket.gethostbyname(socket.gethostname())
+port=8000
+LOGGER.log("Server", f"Server Running on http://{ipaddress}:{8000}")
 
 
 def cleanup_games():
@@ -65,22 +78,23 @@ def index():
       #leaderboard logic
       if not firstgame: #leaderboard update
          currentgame = games[session['sessionID']]
-         leaderBoard.add_score(currentgame.difficulty, session.get('name'), lastScore) # add last games score to database after loss
+         lb_handler.add_score(difficulty=currentgame.difficulty, entry={"name" : session.get('name'), "score": lastScore})
          LOGGER.success("Leaderboard", f"Updated: Difficulty:{currentgame.difficulty}, Name:{session.get('name')}, Score:{lastScore}")
 
-      leaderBoardData = leaderBoard.get_top_scores_dict("all", 5) # get all leaderboards from leaderboard.db
+      leaderBoardData = lb_handler.get_top_scores_dict(difficulty="all", limit=5) # get all leaderboards from leaderboard.db
 
       if not firstgame: # adding own score and name to leaderboard data if not first game
          difficulty = games[session['sessionID']].difficulty
          leaderBoardData["own_name"] = session.get('name')
          leaderBoardData["own_score"] = lastScore
          leaderBoardData["own_difficulty"] = difficulty
-         leaderBoardData["own_position"] = leaderBoard.get_position(difficulty, lastScore)
+         leaderBoardData["own_position"] = lb_handler.get_position(difficulty=difficulty, score=lastScore)
 
         # config for difficulty selector
       difficulties = ["normal", "hard", "extreme"]
       difficulty_names = ["Normal", "Hard", "Extrem"]
 
+      print(leaderBoardData)
       games.pop(session['sessionID'], None) # remove old game if exists
       return render_template("index.html", firstGame = firstgame, difficulties=difficulties, difficulty_names=difficulty_names, leaderBoardData=leaderBoardData)
 
@@ -179,6 +193,32 @@ def test():
    """
    name = session["name"]
    return name
+
+def load_config(yaml_file:str):
+    try:
+        with open(yaml_file, 'r') as f:
+            data = yaml.safe_load(f)
+
+        db_link = data.get('db')["link"]
+        db_password = data.get('db')["password"]
+
+        db_uri = db_link.replace("<Password>", db_password)
+
+        if db_uri:
+            return db_uri
+        else:
+            print("Config", "No 'categories' in config-file")
+
+    except FileNotFoundError:
+        print("File", f"File '{yaml_file}' not found.")
+    except yaml.YAMLError as e:
+        print("Yaml", f"Failed parsing Yaml File", e)
+
+db_uri = load_config(yaml_file="game_config.yaml")
+client = MongoClient(db_uri, server_api=ServerApi('1'))
+lb_handler = leaderboard_handler.Leaderboardhandler(client)
+lb_handler.test_connection()
+
 
 # Garbage collection to clean expired games each minute, seperate Thread
 sheduler = BackgroundScheduler()
