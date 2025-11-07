@@ -6,13 +6,13 @@ scraper/dist/
 scraper/wheels/
 scraper/*.egg-info
 scraper/scraper_config.yaml
+scraper/scraper_config.yaml
 
 # VsCode settings
 server/.vscode/
 server/__pycache__
 server/DB/
 server/game_config.yaml
-
 
 
 #Python test file for db
