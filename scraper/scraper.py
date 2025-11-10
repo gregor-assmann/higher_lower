@@ -1,4 +1,3 @@
-import selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -20,6 +19,7 @@ project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root:
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 from util import database_handler as db_handler
+from util import yamlloader
 
 
 def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
@@ -193,6 +193,8 @@ if __name__ == "__main__":
     
     yaml_file = "scraper_config.yaml"
 
-    categories, x_paths, db_uri = load_config(yaml_file)
+    config = yamlloader.load_config(yaml_file)
+    categories, x_paths = config["categories"], config["paths"]
+    db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
     
     scrape_main(search_terms = categories, x_paths=x_paths, db_uri=db_uri, export_path='articles.json', await_debug=False)

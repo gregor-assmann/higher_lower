@@ -14,6 +14,7 @@ project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root:
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 from util import database_handler
+from util import yamlloader
 
 
 
@@ -78,7 +79,9 @@ class ProductCollection:
     def __init__(self, config_path, file_path = None, *, category = None, products = None):
         self.products = None
         self.category = category
-        self.db_uri = load_config(config_path)
+        config = yamlloader.load_config(yaml_file="game_config.yaml")
+        db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
+        self.db_uri = db_uri
         if products is None:
             if not file_path is None: self.load_products(file_path)
         else:
@@ -138,29 +141,6 @@ class ProductCollection:
 
     def __str__(self):
         return f'{self.__class__.__name__}{'[]' if self.products is None else [product for product in self.products]}'
-
-def load_config(yaml_file:str):
-    try:
-        with open(yaml_file, 'r') as f:
-            data = yaml.safe_load(f)
-
-        db_link = data.get('db')["link"]
-        db_password = data.get('db')["password"]
-
-        if db_link.find("link to db") != -1 or db_password.find("password to db") != -1:
-           LOGGER.error("Yaml", "Please configure Database link and password!")
-
-        db_uri = db_link.replace("<Password>", db_password)
-
-        if db_uri:
-            return db_uri
-        else:
-            print("Config", "No 'categories' in config-file")
-
-    except FileNotFoundError:
-        print("File", f"File '{yaml_file}' not found.")
-    except yaml.YAMLError as e:
-        print("Yaml", f"Failed parsing Yaml File", e)
 
 def main():
     prodcoll = ProductCollection(config_path="game_config.yaml")

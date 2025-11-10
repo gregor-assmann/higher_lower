@@ -8,19 +8,21 @@ import socket
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import yaml
+import sys
+import os
 
 from randomgenerator import generate_nickname
 from game import Game
 
 # Import from util is scuffed because making it a module or package didnt work
-import sys
-import os
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, '..'))  # project root: higher_lower
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
 from util.logger import Logger
 from util import leaderboard_handler
+from util import yamlloader
 
 
 dirname = str(Path(__file__).parent.parent)
@@ -193,30 +195,8 @@ def test():
    name = session["name"]
    return name
 
-def load_config(yaml_file:str):
-    try:
-        with open(yaml_file, 'r') as f:
-            data = yaml.safe_load(f)
-
-        db_link = data.get('db')["link"]
-        db_password = data.get('db')["password"]
-
-        if db_link.find("link to db") != -1 or db_password.find("password to db") != -1:
-           LOGGER.error("Yaml", "Please configure Database link and password!")
-
-        db_uri = db_link.replace("<Password>", db_password)
-
-        if db_uri:
-            return db_uri
-        else:
-            print("Config", "No 'categories' in config-file")
-
-    except FileNotFoundError:
-        print("File", f"File '{yaml_file}' not found.")
-    except yaml.YAMLError as e:
-        print("Yaml", f"Failed parsing Yaml File", e)
-
-db_uri = load_config(yaml_file="game_config.yaml")
+config = yamlloader.load_config(yaml_file="game_config.yaml")
+db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
 client = MongoClient(db_uri, server_api=ServerApi('1'))
 lb_handler = leaderboard_handler.Leaderboardhandler(client)
 lb_handler.test_connection()

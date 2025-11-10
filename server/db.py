@@ -16,7 +16,7 @@ LOGGER =  logger.Logger
 
                     UNUSED
 
-Only as backup. Use leaderboard_handler instead.
+Only as backup. Uses leaderboard_handler instead.
 
 ###############################################
 
