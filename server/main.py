@@ -23,6 +23,8 @@ if project_root not in sys.path:
 from util.logger import Logger
 from util import leaderboard_handler
 from util import yamlloader
+from util import database_handler
+from util import bson_handler
 
 
 dirname = str(Path(__file__).parent.parent)
@@ -31,7 +33,7 @@ games = {}
 games_lock = Lock() # to prevent simultaneous access to games dict from cleanup and main thread
 
 log = logging.getLogger('werkzeug')
-log.setLevel("ERROR")
+#log.setLevel("ERROR")
 
 LOGGER = Logger
 
@@ -200,6 +202,13 @@ db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
 client = MongoClient(db_uri, server_api=ServerApi('1'))
 lb_handler = leaderboard_handler.Leaderboardhandler(client)
 lb_handler.test_connection()
+
+# creates a local dump of the products database
+db_handler = database_handler.DatabaseHandler(client=client)
+db_handler.test_connection()
+local_db_handler = bson_handler.BsonHandler(db_handler=db_handler)
+local_db_handler.create_local_dump()
+
 
 
 # Garbage collection to clean expired games each minute, seperate Thread
