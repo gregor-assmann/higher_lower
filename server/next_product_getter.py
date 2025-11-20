@@ -15,6 +15,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 from util import database_handler
 from util import yamlloader
+from util import bson_handler
 
 
 
@@ -108,8 +109,10 @@ class ProductCollection:
         client = MongoClient(self.db_uri, server_api=ServerApi('1'))
         db_handler = database_handler.DatabaseHandler(client)
         db_handler.test_connection()
+        local_db_handler = bson_handler.BsonHandler(db_handler=db_handler)
 
-        products = list(db_handler.get_all_entries())
+
+        products = local_db_handler.load_from_bson()
 
         LOGGER.load("Products", "Products loaded")
         self.products = [Product(**product) for product in products]
