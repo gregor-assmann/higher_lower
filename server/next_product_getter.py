@@ -93,24 +93,11 @@ class ProductCollection:
         """
         Loads Products from JSON as one large list and converts them to Product objects
         """
-
-        #with open(file_path, encoding='utf-8') as f:
-
-        """categories = json.load(f)
-        products = None
-        if self.category is None:
-            # Adds together all products of all categories
-            products = [product for k, v in categories.items() for product in v]
-        else:
-            products = categories[self.category]
-        # Unpacks the product dictionary into the Product class constructor"""
-            
         
         client = MongoClient(self.db_uri, server_api=ServerApi('1'))
         db_handler = database_handler.DatabaseHandler(client)
         db_handler.test_connection()
         local_db_handler = bson_handler.BsonHandler(db_handler=db_handler)
-
 
         products = local_db_handler.load_from_bson()
 

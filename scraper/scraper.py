@@ -161,33 +161,6 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
     print(f"Total articles scraped: {total_count}")
 
     driver.quit()
-    
-def load_config(yaml_file:str):
-    try:
-        with open(yaml_file, 'r') as f:
-            data = yaml.safe_load(f)
-
-        # get config data by paramater
-        categories = data.get('categories')
-        x_paths = data.get('paths')
-
-        db_link = data.get('db')["link"]
-        db_password = data.get('db')["password"]
-
-        if db_link.find("link to db") != -1 or db_password.find("password to db") != -1:
-           print("Yaml", "Please configure Database link and password!")
-
-        db_uri = db_link.replace("<Password>", db_password)
-
-        if categories:
-            return categories, x_paths, db_uri
-        else:
-            print("Config", "No 'categories' in config-file")
-
-    except FileNotFoundError:
-        print("File", f"File '{yaml_file}' not found.")
-    except yaml.YAMLError as e:
-        print("Yaml", f"Failed parsing Yaml File", e)
 
 if __name__ == "__main__":
     

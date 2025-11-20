@@ -63,5 +63,3 @@ def get_high_quality_link(original_link:str, alt_img_link:str):
 #dumm einfach so das full res bild zu bekommen hätte man auch mal vorher testen können
 def even_better_and_stupidly_simple_img_link(original_link:str):
     return strip_original_link(original_link)
-
-print(even_better_and_stupidly_simple_img_link("https://i.otto.de/i/otto/18c24ea0-05fa-5e1a-95e5-d3a533452166?$responsive_ft2$"))

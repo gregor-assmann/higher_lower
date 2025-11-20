@@ -197,6 +197,8 @@ def test():
    name = session["name"]
    return name
 
+# setup db connections and products
+
 config = yamlloader.load_config(yaml_file="game_config.yaml")
 db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
 client = MongoClient(db_uri, server_api=ServerApi('1'))
