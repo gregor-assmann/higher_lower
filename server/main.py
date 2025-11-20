@@ -7,9 +7,9 @@ import logging
 import socket
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-import yaml
 import sys
 import os
+import datetime
 
 from randomgenerator import generate_nickname
 from game import Game
@@ -82,7 +82,7 @@ def index():
       #leaderboard logic
       if not firstgame: #leaderboard update
          currentgame = games[session['sessionID']]
-         lb_handler.add_score(difficulty=currentgame.difficulty, entry={"name" : session.get('name'), "score": lastScore})
+         lb_handler.add_score(difficulty=currentgame.difficulty, entry={"name" : session.get('name'), "score": lastScore, "timestamp": datetime.datetime.now()})
          LOGGER.success("Leaderboard", f"Updated: Difficulty:{currentgame.difficulty}, Name:{session.get('name')}, Score:{lastScore}")
 
       leaderBoardData = lb_handler.get_top_scores_dict(difficulty="all", limit=5) # get all leaderboards from leaderboard.db
