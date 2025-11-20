@@ -73,3 +73,24 @@ class DatabaseHandler:
         except:
             LOGGER.error("Getting data", f"Failed to get entries")
             return []
+        
+    def get_sample_of_entries(self, sample_size=500):
+        
+        """
+        Gets a random sample of Products and returns a CommandCursor. <br>
+        Can be converted using `list()` to get a list of all entries.
+
+        :param sample_size: Specifies the amount of products
+        """
+
+        pipeline = [
+            { "$sample": { "size": sample_size } },
+            { "$project": { "_id": 0 } }  # Ignore id
+        ]
+
+        try:
+            entries = self.collection_name.aggregate(pipeline)
+            return entries
+        except:
+            LOGGER.error("Getting data", f"Failed to get entries")
+            return []

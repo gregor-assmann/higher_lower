@@ -31,7 +31,7 @@ games = {}
 games_lock = Lock() # to prevent simultaneous access to games dict from cleanup and main thread
 
 log = logging.getLogger('werkzeug')
-log.setLevel("ERROR")
+#log.setLevel("ERROR")
 
 LOGGER = Logger
 
