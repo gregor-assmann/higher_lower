@@ -85,6 +85,7 @@ header {
     display: flex;
     align-items: center;
     transition: 300ms ease-in-out;
+    position: sticky;
 }
 
 .header-content {

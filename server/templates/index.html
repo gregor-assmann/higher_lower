@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/index_style.css">
     <script src="/static/js/index_script.js"></script>
-    
+    <script src="/static/js/theme_toggle.js"></script>
+
 </head>
 <body class = "index-body">
 
@@ -66,6 +67,9 @@
     <footer>
         <button onclick=toggleTheme() class="footer-button">
             <img class="mode-img" src="/static/images/light-mode.png"/>
+        </button>
+        <button onclick="location.href='/stats'" class="footer-button-left">
+            <img class="mode-img" src="/static/images/stats.png"/>
         </button>
     </footer>
 
