@@ -27,7 +27,7 @@
 
                 {% for idx in range(3) %}
                 <label class="difficulty {{ difficulty_list[idx] }}" data-name="{{ difficulty_list[idx] }}">
-                    <input type="radio" name="difficulty" value="{{ difficulty_list[idx] }}" form="start-game-form" {% if idx == 0 %}checked{% endif %}>
+                    <input type="radio" name="difficulty" value="{{ difficulty_list[idx] }}" form="start-game-form" {% if idx == selectedDifficulty %}checked{% endif %}>
                     <span class="label-text">{{ difficulty_name_list[idx] }}</span>
                 </label>
                 {%endfor%}
