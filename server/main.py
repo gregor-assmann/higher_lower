@@ -87,19 +87,23 @@ def index():
 
       leaderBoardData = lb_handler.get_top_scores_dict(difficulty="all", limit=5) # get all leaderboards from leaderboard.db
 
+        # config for difficulty selector
+      difficulties = ["normal", "hard", "extreme"]
+      difficulty_names = ["Normal", "Hard", "Extrem"]
+
+
+      selectedDifficultyIdx = 0
       if not firstgame: # adding own score and name to leaderboard data if not first game
          difficulty = games[session['sessionID']].difficulty
          leaderBoardData["own_name"] = session.get('name')
          leaderBoardData["own_score"] = lastScore
          leaderBoardData["own_difficulty"] = difficulty
          leaderBoardData["own_position"] = lb_handler.get_position(difficulty=difficulty, score=lastScore)
+         selectedDifficultyIdx = difficulties.index(difficulty)
 
-        # config for difficulty selector
-      difficulties = ["normal", "hard", "extreme"]
-      difficulty_names = ["Normal", "Hard", "Extrem"]
 
       games.pop(session['sessionID'], None) # remove old game if exists
-      return render_template("index.html", firstGame = firstgame, difficulties=difficulties, difficulty_names=difficulty_names, leaderBoardData=leaderBoardData)
+      return render_template("index.html", firstGame = firstgame, difficulties=difficulties, difficulty_names=difficulty_names, leaderBoardData=leaderBoardData, selectedDifficulty = selectedDifficultyIdx)
 
 
 @app.route("/new_game", methods = ["POST"])

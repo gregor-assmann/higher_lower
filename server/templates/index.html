@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Higher or Lower</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/favicon.png">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/index_style.css">
     <script src="/static/js/index_script.js"></script>
@@ -27,7 +28,7 @@
 
                 {% for idx in range(3) %}
                 <label class="difficulty {{ difficulty_list[idx] }}" data-name="{{ difficulty_list[idx] }}">
-                    <input type="radio" name="difficulty" value="{{ difficulty_list[idx] }}" form="start-game-form" {% if idx == 0 %}checked{% endif %}>
+                    <input type="radio" name="difficulty" value="{{ difficulty_list[idx] }}" form="start-game-form" {% if idx == selectedDifficulty %}checked{% endif %}>
                     <span class="label-text">{{ difficulty_name_list[idx] }}</span>
                 </label>
                 {%endfor%}
@@ -57,7 +58,7 @@
             {%endif%}
                
             <form id="start-game-form" method="POST" action="/new_game" class="start-game-form">
-                <input name="username" type="text" class="username-input" placeholder="Gib deinen Namen ein" value={{(leaderBoardData["own_name"])}}>
+                <input name="username" type="text" class="username-input" placeholder="Gib deinen Namen ein" value="{{(leaderBoardData["own_name"])}}">
                 <input type="submit" value="Neues Spiel" class="start-game-button"/>
             </form>
             

@@ -284,11 +284,6 @@ body {
     display: none;
 }
 
-footer {
-    transition: 200ms;
-    background-color: var(--background);
-}
-
 .footer-button-left {
     position: fixed;
     background-color: var(--center-container);
