@@ -39,6 +39,9 @@ class Leaderboardhandler:
         try:
             collection_name = self.db_name[difficulty]
             collection_name.insert_one(entry)
+            collection_name = self.db_name["total"]
+            entry["difficulty"] = difficulty
+            collection_name.insert_one(entry)
             LOGGER.success("Writing data", f"Added a leaderboard entry.")
         except:
             LOGGER.error("Writing data", "Failed to write data in MongoDB")

@@ -32,7 +32,7 @@ dirname = str(Path(__file__).parent.parent)
 games = {}
 games_lock = Lock() # to prevent simultaneous access to games dict from cleanup and main thread
 
-log = logging.getLogger('werkzeug')
+#log = logging.getLogger('werkzeug')
 #log.setLevel("ERROR")
 
 LOGGER = Logger
@@ -188,6 +188,10 @@ def guess():
             dict['correct'] = False
             currentGame.gameOver = True
             return jsonify(dict)
+
+@app.route("/stats")
+def stats():
+   return render_template("stats.html")
 
 @app.route("/test")
 def test():

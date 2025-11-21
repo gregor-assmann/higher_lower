@@ -289,13 +289,13 @@ footer {
     background-color: var(--background);
 }
 
-.footer-button {
+.footer-button-left {
     position: fixed;
     background-color: var(--center-container);
     border: none;
     bottom: 3vh;
-    right: 3vh;
-   width: 50px;
+    left: 3vh;
+    width: 50px;
     height: 50px;
     border-radius: 10px;
     display: block;
@@ -306,25 +306,14 @@ footer {
     box-shadow: 0 3px 3px rgba(0, 0, 0, 0.046)
 }
 
-.footer-button:hover{
+.footer-button-left:hover{
     scale: 1.05;
 }
-.footer-button:active{
+.footer-button-left:active{
     scale: 1;
 }
 
-.footer-button:active .mode-img{
+.footer-button-left:active .mode-img{
     scale: .5;
-    rotate: 60deg;
-}
-
-.mode-img {
-    align-items: center;
-    justify-content: center;
-    margin-top: 3px;
-    margin-left: 1px;
-    width: 25px;
-    height:25px;
-    transition: 500ms;
-    filter: var(--inversion)
+    rotate: -60deg;
 }
