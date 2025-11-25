@@ -21,16 +21,6 @@ function generateStatTiles(ids){
     }
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-    generateStatTiles(ids);
-});
-
-
-/**
- * PlotCard for Barcharts
- * The plot can be partly styled via css using the .plot-card selector
- * 
- */
 class PlotCardBar {
     /**
      * Creates a new PlotCard with the given options
@@ -43,7 +33,6 @@ class PlotCardBar {
      * @param {Object} options 
      */
     constructor(plotName, options) {
-
         this.plotName = plotName;
         this.data = options.data;
         this.orientation = options.orientation ?? "v";
@@ -107,7 +96,6 @@ class PlotCardBar {
      */
     formatData(){
         var formattedData = [];
-        console.log(this.data)
         for(var idx in this.data){
             var trace = this.data[idx]
             var formattedTrace = {x: [], y: [], name: trace.name, orientation:this.orientation, type: "bar", hovertemplate: null, marker: {color: '#ee2e32'}}
@@ -122,7 +110,44 @@ class PlotCardBar {
 
             formattedData.push(formattedTrace);
         }
-        console.log(formattedData)
         return formattedData;
+    }
+}
+
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+    generateStatTiles(ids);
+
+    createCard("/getstats?data=score-by-date")
+});
+
+async function getData(link){
+   try {
+    const response = await fetch(link);
+
+    if(!response.ok) throw new Error("Error fetching Data")
+    
+    const data = await response.json()
+    return data;
+   } catch(error) {
+    console.error("Error parsing Data: ", error)
+    return null;
+   }
+}
+// todo: add support for multiple traces
+async function createCard(link){
+    const trace = {name: "Score by Date", values: [], labels: []}
+    try {
+        const data = await getData(link);
+        if (!data) { console.error("No data received for score-by-date"); return;}
+        trace.values = data.values
+        trace.labels = data.labels
+        const card = new PlotCardBar("score-by-date", {title: "Total Score by Date", orientation: "v", data: [trace]});
+        card.createContainer(".stat-container")
+        card.render()
+    } catch (err) {
+        console.error(err);
+        return null
     }
 }

@@ -197,11 +197,19 @@ def guess():
 def stats():
    return render_template("stats.html")
 
-# mit query parametern
+
 @app.route("/getstats", methods = ["GET"])
 def getstats():
-   print(lb_handler.get_games_by_name())
-   return render_template("stats.html")
+   data_type = request.args.get("data")
+   match data_type:
+      case "games-by-name":
+         values = lb_handler.get_games_by_name()
+      case "score-by-date":
+         values = lb_handler.get_total_score_by_date()
+      case "games-by-date":
+        values = lb_handler.get_games_by_date()
+   print(data_type)
+   return values
 
 @app.route("/test")
 def test():
