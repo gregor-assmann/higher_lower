@@ -1,4 +1,4 @@
 db:
-    link: mongodb+srv://gregorassmann:<Password>@higherlower.ojazzfb.mongodb.net/?appName=HigherLower
+    link: mongodb+srv://higherlowerapp:<Password>@higherlower.ojazzfb.mongodb.net/?appName=HigherLower
     password: Password
 
