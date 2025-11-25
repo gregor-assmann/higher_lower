@@ -24,3 +24,105 @@ function generateStatTiles(ids){
 document.addEventListener("DOMContentLoaded", (event) => {
     generateStatTiles(ids);
 });
+
+
+/**
+ * PlotCard for Barcharts
+ * The plot can be partly styled via css using the .plot-card selector
+ * 
+ */
+class PlotCardBar {
+    /**
+     * Creates a new PlotCard with the given options
+     * Options must contain:
+     * data -> a list of Traces with name, labels, values and optionally a color
+     * Options may contain:
+     * color, title, orientaion
+     * 
+     * @param {String} plotName 
+     * @param {Object} options 
+     */
+    constructor(plotName, options) {
+
+        this.plotName = plotName;
+        this.data = options.data;
+        this.orientation = options.orientation ?? "v";
+
+        this.layout = {
+            title: options.title,
+            barmode: 'stack',
+            plot_bgcolor: options.color ?? "rgb(38, 39, 43)",
+            paper_bgcolor: options.color ?? "rgb(38, 39, 43)",
+            font: {
+                family: 'Arial',
+                size: 18,
+                color: '#7f7f7f'
+            },
+            showlegend: false,
+            hovermode: this.orientation === "h" ? "y unified" : "x unified",
+            yaxis: {automargin: true},
+            xaxis: {automargin: true},
+            margin:{
+                t: 60
+            }
+        };
+
+        this.config = { displayModeBar: false };
+    }
+
+    /**
+     * 
+     * Creates a plotCard as a child of an object with the given class name
+     * 
+     * @param {String} parentClassName 
+     */
+    createContainer(parentClassName) {
+        var container = document.querySelector(parentClassName)
+        container.insertAdjacentHTML("beforeend",`<div id="${this.plotName}" class="plot-card"></div>`);
+    }
+
+    /**
+     * Renders the Plot Card to the container 
+     */
+    render() {
+        if (typeof Plotly === 'undefined') {
+            throw new Error('Plotly is not loaded');
+        }
+        Plotly.newPlot(this.plotName, this.formatData(), this.layout, this.config);
+    }
+
+    updateData(newData) {
+        this.data = newData;
+        return this;
+    }
+
+    updateLayout(newLayout) {
+        this.layout = Object.assign({}, this.layout, newLayout);
+        return this;
+    }
+
+    /**
+     * Formats the PlotCards data to a format that is usable for plotly
+     * @returns 
+     */
+    formatData(){
+        var formattedData = [];
+        console.log(this.data)
+        for(var idx in this.data){
+            var trace = this.data[idx]
+            var formattedTrace = {x: [], y: [], name: trace.name, orientation:this.orientation, type: "bar", hovertemplate: null, marker: {color: '#ee2e32'}}
+            if(this.orientation === "h"){
+                formattedTrace.x = trace.values;
+                formattedTrace.y = trace.labels;
+            } else {
+                formattedTrace.x = trace.labels;
+                formattedTrace.y = trace.values;
+            }
+            if(trace.color) formattedTrace.marker.color = trace.color;
+
+            formattedData.push(formattedTrace);
+        }
+        console.log(formattedData)
+        return formattedData;
+    }
+}

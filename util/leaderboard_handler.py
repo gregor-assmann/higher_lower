@@ -105,4 +105,81 @@ class Leaderboardhandler:
         except:
             LOGGER.error("Getting data", f"Failed to get top scores")
             return []
+    
+    def get_games_by_name(self):
         
+        """
+        Returns a list of the top ten entries by Played Games by Name.<br>
+        Entries contain a `name`, `total` and `difficulties` field. <br>
+        The `difficulties` field contains the count by difficulty.
+        """
+
+        pipeline=[
+            {
+                '$group': {
+                    '_id': '$name', 
+                    'count': {
+                        '$sum': 1
+                    }
+                }
+            }, {
+                '$sort': {
+                    'count': -1
+                }
+            }, {
+                '$limit': 10
+            }, {
+                '$lookup': {
+                    'from': 'total', 
+                    'localField': '_id', 
+                    'foreignField': 'name', 
+                    'as': 'difficulties'
+                }
+            }, {
+                '$unwind': '$difficulties'
+            }, {
+                '$group': {
+                    '_id': {
+                        'name': '$_id', 
+                        'difficulty': '$difficulties.difficulty'
+                    }, 
+                    'count': {
+                        '$sum': 1
+                    }
+                }
+            }, {
+                '$group': {
+                    '_id': '$_id.name', 
+                    'difficulties': {
+                        '$push': {
+                            'difficulty': '$_id.difficulty', 
+                            'count': '$count'
+                        }
+                    }
+                }
+            }
+        ]
+        try:
+            collection_name = self.db_name["total"]
+            entries = list(collection_name.aggregate(pipeline=pipeline))
+            for entry in entries:
+                difficulties_temp = entry["difficulties"]
+                entry["difficulties"] = {}
+                entry["name"] = entry["_id"]
+                del entry["_id"]
+                total = 0
+                for diff in difficulties_temp:
+                    entry["difficulties"][diff["difficulty"]] = diff["count"]
+                    total += diff["count"]
+                entry["total"] = total
+            entries.sort(key=lambda x: -x["total"]) # minus to reverse the order from greates to lowest
+            return entries
+        except:
+            LOGGER.error("Getting data", "Failed to get Games by name")
+
+
+    def get_total_score_by_date(self):
+        pass
+
+    def get_games_by_date(self):
+        pass

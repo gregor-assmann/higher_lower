@@ -197,6 +197,12 @@ def guess():
 def stats():
    return render_template("stats.html")
 
+# mit query parametern
+@app.route("/getstats", methods = ["GET"])
+def getstats():
+   print(lb_handler.get_games_by_name())
+   return render_template("stats.html")
+
 @app.route("/test")
 def test():
    """
