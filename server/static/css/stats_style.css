@@ -39,20 +39,19 @@ body {
 }
 
 .stat-container{
-    display: grid;
+    display: flex;
     justify-content: center;
-    grid-template-rows: 40vh;
-    grid-auto-rows: 40vh;
-    grid-template-columns: repeat(auto-fit, minmax(40vw, 10px));
-    gap: 10px
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .stat-frame{
     background: var(--center-container);
     border: none;
     border-radius: 10px;
-    height: 40vh;
-    width: 40vw;
+    width: 500px;
+    height: 350px;
 }
 
 .footer-button-left {
@@ -93,4 +92,12 @@ body {
     height:25px;
     transition: 500ms;
     filter: var(--inversion)
+}
+
+.plot-card{
+    width: 38vw;
+    height: 38vh;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgb(38, 39, 43);
 }

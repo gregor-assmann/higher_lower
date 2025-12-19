@@ -47,13 +47,24 @@ def cleanup_games():
    """
    Cleans up expired games.
    """
-
    with games_lock:
       for game in list(games.items()):
          if game[1].expired():
             LOGGER.log("Game", "Game has expired.")
             games.pop(game[0], None)
          
+stats_dict = {}
+def update_stats():
+   
+    """
+    Pulls the latest stats from the database
+    """
+
+    stats_dict["games-by-name"] = lb_handler.get_games_by_name()
+    stats_dict["score-by-date"] = lb_handler.get_total_score_by_date()
+    stats_dict["games-by-date"] = lb_handler.get_games_by_date()
+    stats_dict["topscore-by-name"] = lb_handler.get_highscore_by_name()
+
 
 app = Flask(__name__)
 app.secret_key = "jalkdfekllypkekdkdpqwpeioxyvenljjlkjnsnvnasvnela"
@@ -197,6 +208,15 @@ def guess():
 def stats():
    return render_template("stats.html")
 
+
+@app.route("/getstats", methods = ["GET"])
+def getstats():
+   data_type = request.args.get("data")
+   
+   if(data_type not in stats_dict.keys()): return "No Data Available"
+
+   return stats_dict[data_type]
+
 @app.route("/test")
 def test():
    """
@@ -224,9 +244,12 @@ local_db_handler.create_local_dump()
 # Garbage collection to clean expired games each minute, seperate Thread
 sheduler = BackgroundScheduler()
 sheduler.add_job(func=cleanup_games, trigger="interval", minutes=1)
+sheduler.add_job(func=update_stats, trigger="interval", minutes=5)
 sheduler.start()
+
+update_stats()
 
 
 if __name__ == '__main__':
-   app.run(debug = True)
+   app.run(debug = True, port=8000)
    

@@ -1,7 +1,8 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import pymongo
-
+from datetime import datetime
+from datetime import timedelta
 
 import sys
 import os
@@ -105,4 +106,256 @@ class Leaderboardhandler:
         except:
             LOGGER.error("Getting data", f"Failed to get top scores")
             return []
+    
+# TODO make all the stat endpoints return a list of value label list pairs for ease of use
+# pass value_ids for access in js
+
+    def get_games_by_name(self):
         
+        """
+        Returns a list of the top ten entries by Played Games by Name.<br>
+        Entries contain a `name`, `total` and `difficulties` field. <br>
+        The `difficulties` field contains the count by difficulty.
+        """
+
+        pipeline=[
+            {
+                '$group': {
+                    '_id': '$name', 
+                    'count': {
+                        '$sum': 1
+                    }
+                }
+            }, {
+                '$sort': {
+                    'count': -1
+                }
+            }, {
+                '$limit': 10
+            }, {
+                '$lookup': {
+                    'from': 'total', 
+                    'localField': '_id', 
+                    'foreignField': 'name', 
+                    'as': 'difficulties'
+                }
+            }, {
+                '$unwind': '$difficulties'
+            }, {
+                '$group': {
+                    '_id': {
+                        'name': '$_id', 
+                        'difficulty': '$difficulties.difficulty'
+                    }, 
+                    'count': {
+                        '$sum': 1
+                    }
+                }
+            }, {
+                '$group': {
+                    '_id': '$_id.name', 
+                    'difficulties': {
+                        '$push': {
+                            'difficulty': '$_id.difficulty', 
+                            'count': '$count'
+                        }
+                    }
+                }
+            }
+        ]
+
+        # TODO make every entry have every field
+        try:
+            collection_name = self.db_name["total"]
+            entries = list(collection_name.aggregate(pipeline=pipeline))
+            for entry in entries:
+                difficulties_temp = entry["difficulties"]
+                entry["difficulties"] = {}
+                entry["name"] = entry["_id"]
+                del entry["_id"]
+                total = 0
+                for diff in difficulties_temp:
+                    entry["difficulties"][diff["difficulty"]] = diff["count"]
+                    total += diff["count"]
+                entry["total"] = total
+            entries.sort(key=lambda x: x["total"])
+            
+            labels = []
+            values = []
+            for entry in entries:
+                labels.append(entry["name"])
+                diffs = entry["difficulties"]
+                #diffs["total"] = entry["total"]
+                values.append(diffs)
+            
+            value_ids = ["normal", "hard", "extreme"]
+        
+            return [{"labels" : labels, "values" : values, "value-ids": value_ids}]
+
+        except:
+            LOGGER.error("Getting data", "Failed to get Games by name")
+
+
+    def get_total_score_by_date(self, timespan = 7):
+        current_date = datetime.now()
+        past_date = current_date - timedelta(timespan)
+        pipeline = pipeline = [
+            {
+                '$match': {
+                    'timestamp': {
+                        '$gte': past_date
+                    }
+                }
+            }, {
+                '$group': {
+                    '_id': {
+                        'date': {
+                            '$dateToString': {
+                                'format': '%Y-%m-%d', 
+                                'date': '$timestamp'
+                            }
+                        }, 
+                        'difficulty': '$difficulty'
+                    }, 
+                    'totalScore': {
+                        '$sum': "$score"
+                    }
+                }
+            }, {
+                '$group': {
+                    '_id': '$_id.date', 
+                    'scorePerDay': {
+                        '$sum': '$totalScore'
+                    }, 
+                    'difficultyDistribution': {
+                        '$push': {
+                            'difficulty': '$_id.difficulty', 
+                            'totalScore': '$totalScore'
+                        }
+                    }
+                }
+            }
+        ]
+
+
+        try:
+            collection_name = self.db_name["total"]
+            games = list(collection_name.aggregate(pipeline=pipeline))
+
+            #create empty game dict for the past days within the timespan
+            game_dict = {}
+            for i in range(timespan):
+                day = past_date + timedelta(days=i + 1) 
+                game_dict[day.date().__str__()] = {"total": 0, "normal": 0, "hard": 0, "extreme": 0}
+
+            for entry in games:
+                diff_list_as_dict = {}
+                for diff in entry["difficultyDistribution"]:
+                    diff_list_as_dict[diff["difficulty"]] = diff["totalScore"]
+                day_dict = {
+                    "total": entry["scorePerDay"],
+                    "normal": diff_list_as_dict["normal"] if "normal" in diff_list_as_dict else 0,
+                    "hard": diff_list_as_dict["hard"] if "hard" in diff_list_as_dict else 0,
+                    "extreme": diff_list_as_dict["extreme"] if "extreme" in diff_list_as_dict else 0}
+                game_dict[entry["_id"]] = day_dict
+
+            labels = []
+            values = []
+            for k, v in game_dict.items():
+                labels.append(k)
+                values.append(v)
+            value_ids = ["normal", "hard", "extreme"] # total can be ignored
+
+            return [{"labels" : labels, "values" : values, "value-ids": value_ids}]
+
+        except:
+            LOGGER.error("Getting data", "Failed to get score by date")
+
+    def get_games_by_date(self, timespan = 7):
+
+        current_date = datetime.now()
+        past_date = current_date - timedelta(timespan)
+        
+        # vlt nochmal aufräumen wenn zeit und lust
+        pipeline = [
+            {
+                '$match': {
+                    'timestamp': {
+                        '$gte': past_date
+                    }
+                }
+            }, {
+                '$group': {
+                    '_id': {
+                        'date': {
+                            '$dateToString': {
+                                'format': '%Y-%m-%d', 
+                                'date': '$timestamp'
+                            }
+                        }, 
+                        'difficulty': '$difficulty'
+                    }, 
+                    'totalGames': {
+                        '$sum': 1
+                    }
+                }
+            }, {
+                '$group': {
+                    '_id': '$_id.date', 
+                    'gamesPerDay': {
+                        '$sum': '$totalGames'
+                    }, 
+                    'difficultyDistribution': {
+                        '$push': {
+                            'difficulty': '$_id.difficulty', 
+                            'totalGames': '$totalGames'
+                        }
+                    }
+                }
+            }
+        ]
+
+        try:
+            collection_name = self.db_name["total"]
+            games = list(collection_name.aggregate(pipeline=pipeline))
+
+            #create empty game dict for the past days within the timespan
+            game_dict = {}
+            for i in range(timespan):
+                day = past_date + timedelta(days=i + 1) 
+                game_dict[day.date().__str__()] = {"total": 0, "normal": 0, "hard": 0, "extreme": 0}
+
+            for entry in games:
+                diff_list_as_dict = {}
+                for diff in entry["difficultyDistribution"]:
+                    diff_list_as_dict[diff["difficulty"]] = diff["totalGames"]
+                day_dict = {
+                    "total": entry["gamesPerDay"],
+                    "normal": diff_list_as_dict["normal"] if "normal" in diff_list_as_dict else 0,
+                    "hard": diff_list_as_dict["hard"] if "hard" in diff_list_as_dict else 0,
+                    "extreme": diff_list_as_dict["extreme"] if "extreme" in diff_list_as_dict else 0}
+                game_dict[entry["_id"]] = day_dict
+
+            labels = []
+            values = []
+            for k, v in game_dict.items():
+                labels.append(k)
+                values.append(v)
+            value_ids = ["normal", "hard", "extreme"] # total can be ignored
+
+            return [{"labels" : labels, "values" : values, "value-ids": value_ids}]
+        except:
+            LOGGER.error("Getting data", "Failed to get score by date")
+
+    def get_highscore_by_name(self):
+
+        highscore_dict = self.get_top_scores_dict(difficulty="total", limit=10)
+        highscore_dict["total"].reverse()
+        
+        labels = []
+        values = []
+        for entry in highscore_dict["total"]:
+            labels.append(entry[0])
+            values.append({"value": entry[1]})
+
+        return [{"labels" : labels, "values" : values, "value-ids": ["value"]}]
