@@ -23,7 +23,7 @@ services:
         ports:
           - "8000:8000"
 ```
-Und dann einfach `docker compose up` um zu starten
+Und dann einfach `docker compose up -d --pull always` um immer die neueste Version zu starten
 
 
 #### Datenbank
