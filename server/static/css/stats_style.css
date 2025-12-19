@@ -39,21 +39,19 @@ body {
 }
 
 .stat-container{
-    display: grid;
+    display: flex;
     justify-content: center;
-    grid-template-rows: 38vh;
-    grid-auto-rows: 38vh;
-    grid-template-columns: repeat(auto-fit, minmax(38vw, 20px));
-    gap: 50px
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .stat-frame{
     background: var(--center-container);
     border: none;
     border-radius: 10px;
-    width: 38vw;
-    height: 38vh;
-    padding: 20px;
+    width: 500px;
+    height: 350px;
 }
 
 .footer-button-left {
