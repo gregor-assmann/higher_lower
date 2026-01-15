@@ -19,6 +19,13 @@ class PlotCardBar {
             barmode: 'stack',
             plot_bgcolor: options.color ?? "rgba(38, 39, 43, 0)",
             paper_bgcolor: options.color ?? "rgba(38, 39, 43, 0)",
+            hoverlabel:{ 
+                bgcolor: "rgba(149, 153, 165, 1)", 
+                font: {            
+                    color: 'rgba(46, 48, 55, 1)'
+                },
+                bordercolor: "rgba(149, 153, 165, 1)",      // set your desired border color here
+                borderradius: "5"},
             font: {
                 family: 'Arial',
                 color: '#7f7f7f'
