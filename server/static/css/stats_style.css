@@ -11,7 +11,9 @@
     --username: #eaeaea;
     --username-hover: #fff;
 
-    --inversion: invert(.1)
+    --inversion: invert(.1);
+
+    --stat_background: #ffffff;
 
 }
 
@@ -30,7 +32,9 @@
     --username-hover: #a4a4a4;
     --username-hover-text: #464646;
     
-    --inversion: invert(.9)
+    --inversion: invert(.9);
+
+    --stat_background: #363636
 }
 
 body {
@@ -99,5 +103,5 @@ body {
     height: 38vh;
     padding: 20px;
     border-radius: 10px;
-    background-color: var(--table-element)
+    background-color: var(--stat_background)
 }

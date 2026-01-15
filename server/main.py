@@ -242,6 +242,7 @@ local_db_handler.create_local_dump()
 
 
 # Garbage collection to clean expired games each minute, seperate Thread
+# Updates the stats in a 5 minute interval
 sheduler = BackgroundScheduler()
 sheduler.add_job(func=cleanup_games, trigger="interval", minutes=1)
 sheduler.add_job(func=update_stats, trigger="interval", minutes=5)
