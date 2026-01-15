@@ -99,5 +99,5 @@ body {
     height: 38vh;
     padding: 20px;
     border-radius: 10px;
-    background-color: rgb(38, 39, 43);
+    background-color: var(--table-element)
 }

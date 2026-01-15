@@ -17,16 +17,16 @@ class PlotCardBar {
         this.layout = {
             title: options.title,
             barmode: 'stack',
-            plot_bgcolor: options.color ?? "rgb(38, 39, 43)",
-            paper_bgcolor: options.color ?? "rgb(38, 39, 43)",
+            plot_bgcolor: options.color ?? "rgba(38, 39, 43, 0)",
+            paper_bgcolor: options.color ?? "rgba(38, 39, 43, 0)",
             font: {
                 family: 'Arial',
                 color: '#7f7f7f'
             },
             showlegend: false,
             hovermode: this.orientation === "h" ? "y unified" : "x unified",
-            yaxis: {automargin: true},
-            xaxis: {automargin: true},
+            yaxis: {automargin: true, showgrid: false,},
+            xaxis: {automargin: true, showgrid: false,},
             margin:{
                 t: 40,
                 l: 0,
