@@ -80,15 +80,14 @@ class ProductCollection:
     def __init__(self, config_path, file_path = None, *, category = None, products = None):
         self.products = None
         self.category = category
-        config = yamlloader.load_config(yaml_file="game_config.yaml")
-        db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
-        self.db_uri = db_uri
+        
+        self.db_uri = yamlloader.load_db_uri("game_config.yaml")
         if products is None:
             if not file_path is None: self.load_products(file_path)
         else:
             self.products = products
 
-    def load_products(self, file_path):
+    def load_products(self):
 
         """
         Loads Products from JSON as one large list and converts them to Product objects
@@ -134,7 +133,7 @@ class ProductCollection:
 
 def main():
     prodcoll = ProductCollection(config_path="game_config.yaml")
-    prodcoll.load_products("some path")
+    prodcoll.load_products()
     for prod in prodcoll.products:
         print(prod.name)
 

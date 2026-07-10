@@ -227,8 +227,8 @@ def test():
 
 # setup db connections and products
 
-config = yamlloader.load_config(yaml_file="game_config.yaml")
-db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
+db_uri = yamlloader.load_db_uri("game_config.yaml")
+
 client = MongoClient(db_uri, server_api=ServerApi('1'))
 lb_handler = leaderboard_handler.Leaderboardhandler(client)
 lb_handler.test_connection()
