@@ -34,7 +34,6 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
         articles = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.TAG_NAME, "article"))
         )
-
         for article in articles:
             try:
                 product_brand = article.find_element(By.XPATH, x_paths["brand"])
@@ -168,6 +167,6 @@ if __name__ == "__main__":
 
     config = yamlloader.load_config(yaml_file)
     categories, x_paths = config["categories"], config["paths"]
-    db_uri = config["db"]["link"].replace("<Password>", config["db"]["password"])
+    db_uri = yamlloader.load_db_uri(yaml_file)
     
     scrape_main(search_terms = categories, x_paths=x_paths, db_uri=db_uri, export_path='articles.json', await_debug=False)
