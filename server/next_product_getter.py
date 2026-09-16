@@ -1,8 +1,5 @@
-import json
-from os import path
 import random
 import util.logger as logger
-import yaml
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -15,7 +12,6 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 from util import database_handler
 from util import yamlloader
-from util import bson_handler
 
 
 
@@ -77,28 +73,30 @@ class Product:
         return f'{self.name}: {self.price}€'
 
 class ProductCollection:
-    def __init__(self, config_path, file_path = None, *, category = None, products = None):
+    def __init__(self, config_path="game_config.yaml", *, category=None, products=None):
         self.products = None
         self.category = category
-        
-        self.db_uri = yamlloader.load_db_uri("game_config.yaml")
-        if products is None:
-            if not file_path is None: self.load_products(file_path)
-        else:
+
+        if products is not None:
             self.products = products
+        else:
+            self.db_uri = yamlloader.load_db_uri(config_path)
+            self.load_products()
 
     def load_products(self):
 
         """
-        Loads Products from JSON as one large list and converts them to Product objects
+        Loads products from MongoDB and converts them to Product objects.
         """
         
         client = MongoClient(self.db_uri, server_api=ServerApi('1'))
         db_handler = database_handler.DatabaseHandler(client)
         db_handler.test_connection()
-        local_db_handler = bson_handler.BsonHandler(db_handler=db_handler)
+        products = list(db_handler.get_all_entries())
+        client.close()
 
-        products = local_db_handler.load_from_bson()
+        if not products:
+            raise RuntimeError("No products found in MongoDB")
 
         LOGGER.load("Products", "Products loaded")
         self.products = [Product(**product) for product in products]
@@ -129,7 +127,8 @@ class ProductCollection:
         return self.products.__len__()
 
     def __str__(self):
-        return f'{self.__class__.__name__}{'[]' if self.products is None else [product for product in self.products]}'
+        products = [] if self.products is None else [product for product in self.products]
+        return f'{self.__class__.__name__}{products}'
 
 def main():
     prodcoll = ProductCollection(config_path="game_config.yaml")

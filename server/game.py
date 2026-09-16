@@ -1,17 +1,13 @@
-from pathlib import Path
 import datetime
 
-from next_product_getter import Product, ProductCollection, Difficulty
+from next_product_getter import ProductCollection, Difficulty
 from randomgenerator import generate_parceltime
 
-
-dirname = str(Path(__file__).parent.parent)
-
 class Game:
-   def __init__(self, difficulty, article_file_path = None):
+   def __init__(self, difficulty):
       self.score = 0
       self.difficulty = difficulty
-      self.collection = ProductCollection(config_path="game_config.yaml", file_path=(dirname + r'/scraper/articles.json') if article_file_path is None else article_file_path)
+      self.collection = ProductCollection(config_path="game_config.yaml")
       
       self.productLast = self.collection.next_product()
       self.productNext = self.collection.next_product()

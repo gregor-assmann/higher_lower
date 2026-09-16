@@ -13,11 +13,9 @@ function show_selected_board() {
             leaderboards[i].classList.remove("hidden");
             own_place = document.querySelector(".leaderboard-element-player");
             console.log(e.value);
-            console.log(own_place.getAttribute("data-name"));
-            if (e.value == own_place.getAttribute("data-name")) {
+            if (own_place && e.value == own_place.getAttribute("data-name")) {
                 own_place.classList.remove("hidden");
-            }
-            else {
+            } else if (own_place) {
                 own_place.classList.add("hidden");
             }
         }

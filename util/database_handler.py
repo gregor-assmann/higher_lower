@@ -38,6 +38,23 @@ class DatabaseHandler:
         except:
             LOGGER.error("Writing data", "Failed to write data in MongoDB")
 
+    def replace_category(self, category, product_data:list):
+        """Replaces one category in a transaction after a successful scrape."""
+        if not product_data:
+            LOGGER.error("Writing data", f"Refused to replace empty category: {category}")
+            return False
+
+        try:
+            with self.client.start_session() as session:
+                with session.start_transaction():
+                    self.collection_name.delete_many({"category": category}, session=session)
+                    self.collection_name.insert_many(product_data, session=session)
+            LOGGER.success("Writing data", f"Replaced category {category} with {len(product_data)} products.")
+            return True
+        except Exception as e:
+            LOGGER.error("Writing data", f"Failed to replace category: {category}", e)
+            return False
+
     def delete_category(self, category):
         """
         Deletes all Products with the corresponding category tag.

@@ -38,11 +38,12 @@ class Leaderboardhandler:
         """
 
         try:
-            collection_name = self.db_name[difficulty]
-            collection_name.insert_one(entry)
-            collection_name = self.db_name["total"]
-            entry["difficulty"] = difficulty
-            collection_name.insert_one(entry)
+            difficulty_entry = dict(entry)
+            self.db_name[difficulty].insert_one(difficulty_entry)
+
+            total_entry = dict(entry)
+            total_entry["difficulty"] = difficulty
+            self.db_name["total"].insert_one(total_entry)
             LOGGER.success("Writing data", f"Added a leaderboard entry.")
         except:
             LOGGER.error("Writing data", "Failed to write data in MongoDB")

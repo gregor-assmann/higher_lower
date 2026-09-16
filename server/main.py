@@ -23,8 +23,6 @@ if project_root not in sys.path:
 from util.logger import Logger
 from util import leaderboard_handler
 from util import yamlloader
-from util import database_handler
-from util import bson_handler
 
 
 dirname = str(Path(__file__).parent.parent)
@@ -67,7 +65,7 @@ def update_stats():
 
 
 app = Flask(__name__)
-app.secret_key = "jalkdfekllypkekdkdpqwpeioxyvenljjlkjnsnvnasvnela"
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "development-only-secret")
 
 
 @app.route("/")
@@ -83,7 +81,7 @@ def index():
 
    sesssionID = session.get('sessionID')
    if sesssionID is None:
-     session['sessionID'] = uuid.uuid4()
+       session['sessionID'] = str(uuid.uuid4())
 
    with games_lock:
       #Add score of last game if not first game
@@ -128,7 +126,7 @@ def new_game():
    
    """
 
-   if session["sessionID"] is None:
+   if session.get("sessionID") is None:
       LOGGER.failure("New Game", "Invalid Session ID")
       return redirect(url_for("index"))
    else:  
@@ -137,7 +135,9 @@ def new_game():
       session['name'] = name if name != "" else generate_nickname(dirname + r"/server/words.json")
 
       #set game difficulty
-      difficulty = request.form["difficulty"]
+      difficulty = request.form.get("difficulty")
+      if difficulty not in {"normal", "hard", "extreme"}:
+         return redirect(url_for("index"))
       #create new game and add to list of games: games
       game = Game(difficulty=difficulty)
       with games_lock: games[session['sessionID']] = game
@@ -232,14 +232,6 @@ db_uri = yamlloader.load_db_uri("game_config.yaml")
 client = MongoClient(db_uri, server_api=ServerApi('1'))
 lb_handler = leaderboard_handler.Leaderboardhandler(client)
 lb_handler.test_connection()
-
-# creates a local dump of the products database
-db_handler = database_handler.DatabaseHandler(client=client)
-db_handler.test_connection()
-local_db_handler = bson_handler.BsonHandler(db_handler=db_handler)
-local_db_handler.create_local_dump()
-
-
 
 # Garbage collection to clean expired games each minute, seperate Thread
 # Updates the stats in a 5 minute interval

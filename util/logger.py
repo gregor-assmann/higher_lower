@@ -30,7 +30,7 @@ class Logger:
     def __construct_log(logtype:str, location:str, message:str):
         current_time = datetime.datetime.now()
         date = current_time.date()
-        time = f"{current_time.hour}:{current_time.minute if current_time.minute >9 else f"0{current_time.minute}"}"
+        time = f"{current_time.hour}:{current_time.minute:02d}"
         print(f"{date}|{time} - {logtype} @ {location}: {message}")
 
     def load(location:str, message:str):

@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import time
 import yaml
+import atexit
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -134,7 +135,16 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
     #Setup WebDriver
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome(options=options)
+    def close_driver():
+        try:
+            driver.quit()
+        except Exception:
+            pass
+
+    atexit.register(close_driver)
     print("Initializing WebDriver...")
     if await_debug:
         time.sleep(13) # Await all debug prints from selenium to finish
@@ -144,8 +154,9 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
         products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver, db_uri=db_uri, category = search_term)
         print(f"Collected {len(products)} unique products!")        
         # Handle Data storage
-        database_handler.delete_category(category=search_term)
-        database_handler.write_category(products)
+        replaced = database_handler.replace_category(category=search_term, product_data=products)
+        if not replaced:
+            raise RuntimeError(f"Failed to replace category: {search_term}")
         category_dict[search_term] = products
         print("---------------------------------------------------------")
 
@@ -159,7 +170,8 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
     total_count = sum(len(category) for category in category_dict.values())
     print(f"Total articles scraped: {total_count}")
 
-    driver.quit()
+    close_driver()
+    atexit.unregister(close_driver)
 
 if __name__ == "__main__":
     

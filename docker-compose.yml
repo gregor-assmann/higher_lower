@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    image: higher-lower:latest
+    working_dir: /app/server
+    command: gunicorn --workers 1 --bind 0.0.0.0:8000 main:app
+    ports:
+      - "8000:8000"
+    env_file:
+      - ${ENV_FILE:-.env}
+    restart: unless-stopped
+
+  scraper:
+    build: .
+    image: higher-lower:latest
+    working_dir: /app/scraper
+    command: /app/docker/run-scraper-cron.sh
+    env_file:
+      - ${ENV_FILE:-.env}
+    restart: unless-stopped
