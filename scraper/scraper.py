@@ -39,7 +39,11 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
             try:
                 product_brand = article.find_element(By.XPATH, x_paths["brand"])
                 product_name = article.find_element(By.XPATH, x_paths["name"])
-                product_link = article.find_element(By.XPATH, x_paths["link"])
+                
+                art_num_element = article.find_element(By.XPATH, x_paths["article_number"])
+                raw_art_num = art_num_element.text
+                clean_art_num = "".join(raw_art_num.split())
+                product_link_url = f"https://www.otto.de/p/{clean_art_num}"
 
                 try: #get the price by the right tag
                     product_price = article.find_element(By.XPATH, x_paths["original_price"])
@@ -63,7 +67,7 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
                     "img": image_url,
                     "high_q_img": high_quality_img_url,
                     "alt": alt_image,
-                    "link": product_link.get_attribute("href"),
+                    "link": product_link_url,
                     "category": category,
                 }
                 scraped_data.append(data)
