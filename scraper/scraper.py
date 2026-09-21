@@ -35,7 +35,7 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
         articles = WebDriverWait(driver, 10).until(
             EC.presence_of_all_elements_located((By.TAG_NAME, "article"))
         )
-        for article in articles:
+        for article_index, article in enumerate(articles, start=1):
             try:
                 product_brand = article.find_element(By.XPATH, x_paths["brand"])
                 product_name = article.find_element(By.XPATH, x_paths["name"])
@@ -50,6 +50,7 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
                     product_current_price = product_reference_price
                     product_reference_price = None
                 elif not product_current_price and not product_reference_price:
+                    print(f"Skipped article {article_index}: no price attributes found")
                     continue
 
                 product_image = article.find_element(By.XPATH, x_paths["img"])
@@ -78,8 +79,10 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
                 successful_products += 1
                 print(f"\033[FSuccesfully collected: {successful_products} products!" )
 
-            except NoSuchElementException as e:
-                pass
+            except NoSuchElementException as error:
+                print(f"Skipped article {article_index}: element not found: {error}")
+            except (TypeError, ValueError) as error:
+                print(f"Skipped article {article_index}: invalid product data: {error}")
 
     except TimeoutException:
         print("Timed out whilst trying to load articles.")
