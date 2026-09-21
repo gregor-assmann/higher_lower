@@ -40,21 +40,23 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
                 product_brand = article.find_element(By.XPATH, x_paths["brand"])
                 product_name = article.find_element(By.XPATH, x_paths["name"])
                 
-                art_num_element = article.find_element(By.XPATH, x_paths["article_number"])
-                raw_art_num = art_num_element.text
-                clean_art_num = "".join(raw_art_num.split())
-                product_link_url = f"https://www.otto.de/p/{clean_art_num}"
+                product_link = article.find_element(By.XPATH, x_paths["link"])
+                product_link_url = product_link.get_attribute("href")
 
-                try: #get the price by the right tag
-                    product_price = article.find_element(By.XPATH, x_paths["original_price"])
-                except NoSuchElementException:
-                    product_price = article.find_element(By.XPATH, x_paths["price"])
+                product_price = article.find_element(By.XPATH, x_paths["price"])
+                product_current_price = product_price.get_attribute("retail-price")
+                product_reference_price = product_price.get_attribute("suggested-retail-price")
+                if not product_current_price and product_reference_price:
+                    product_current_price = product_reference_price
+                    product_reference_price = None
+                elif not product_current_price and not product_reference_price:
+                    continue
+
                 product_image = article.find_element(By.XPATH, x_paths["img"])
-
                 #get the right image url and generate the high quality link
                 image_url = product_image.get_attribute("src")
-                if not image_url:
-                    image_url = product_image.get_attribute("data-src")
+                # if not image_url:
+                #     image_url = product_image.get_attribute("data-src")
                 alt_image = product_image.get_attribute("alt")
                 
                 # ... 💀
@@ -63,7 +65,8 @@ def scraper(x_paths:dict, category:str, driver:webdriver.Chrome):
                 data = {
                     "brand": product_brand.text.strip(),
                     "name": product_name.text.strip(),
-                    "price": helper.clean_price(product_price.text),
+                    "price": helper.clean_price(product_current_price),
+                    "old_price": helper.clean_price(product_reference_price) if product_reference_price else None,
                     "img": image_url,
                     "high_q_img": high_quality_img_url,
                     "alt": alt_image,

@@ -41,12 +41,11 @@ categories:
 
 # relative to article-element
 paths:
-    brand: .//li[contains(@class, 'find_tile')]//p[@class='find_tile__brand']
-    name: .//li[contains(@class, 'find_tile')]//p[contains(@class,'find_tile__name')]
-    link: .//li[contains(@class, 'find_tile')]//a[contains(@class,'find_tile__productLink')]
-    original_price: .//li[contains(@class, 'find_tile')]//span[contains(@class,'find_tile__priceValue--strikethrough')]
-    price: .//li[contains(@class, 'find_tile')]//span[contains(@class,'find_tile__priceValue')]
-    img: .//li[contains(@class, 'find_tile')]//img[contains(@class,'find_tile__productImage')]
+    brand: .//div[contains(@class, 'reptile-card')]//span[contains(@class, 'reptile-product-brand')]
+    name: .//div[contains(@class, 'reptile-card')]//span[contains(@class, 'reptile-product-title')]
+    link: .//div[contains(@class, 'reptile-card')]//a
+    price: .//div[contains(@class, 'reptile-card')]//div[contains(@class, 'purchase-info')]//ofc-pricing-item-v1
+    img: .//div[contains(@class, 'reptile-card')]//div[contains(@class, 'reptile-product-image')]//img
 db:
     link: mongodb+srv://<User>:<Password>@higherlower.ojazzfb.mongodb.net/?appName=HigherLower
 

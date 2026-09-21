@@ -32,10 +32,11 @@ Difficulty.hard = Difficulty(1.1, 0.03, 80, 1.5, 0.25)
 Difficulty.extreme = Difficulty(1, 0, 60, 1.5, 0.25)
 
 class Product:
-    def __init__(self,brand, name, price, img, category, link = None, high_q_img = None, alt="product"):
+    def __init__(self,brand, name, price, img, category, link = None, high_q_img = None, alt="product", old_price=None):
         self.brand = brand
         self.name = name
         self.price = float(price)
+        self.old_price = float(old_price) if old_price is not None else None
         self.img = img
         self.high_q_img = high_q_img
         self.alt = alt

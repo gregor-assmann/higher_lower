@@ -2,18 +2,21 @@ import json
 
 def clean_price(pricetag:str):
     """
-    Säubert den Preis zu einem Floatformat
+    Converts Price to a float. Removes symbols and stuff
     """
-    remove_letters = "ab€."
-    new_string = ""
-    for i in pricetag:
-        if i not in remove_letters:
-            if i == ",":
-                new_string += "."
-            else:
-                new_string += i
-    
-    return float(new_string.strip())
+    if pricetag is None:
+        raise ValueError("Price must not be empty")
+
+    raw_price = str(pricetag).strip().replace(" ", "")
+    has_decimal_separator = "," in raw_price
+    cleaned_price = raw_price.replace("ab", "").replace("€", "").replace(".", "")
+    cleaned_price = cleaned_price.replace(",", ".")
+
+    if not cleaned_price:
+        raise ValueError("Price must not be empty")
+    if not has_decimal_separator and cleaned_price.isdigit():
+        return float(cleaned_price) / 100
+    return float(cleaned_price)
             
 def remove_duplicates(list):
     """
