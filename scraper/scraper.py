@@ -5,7 +5,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import time
 import yaml
-import atexit
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -142,26 +141,21 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
     database_handler.test_connection()
     category_dict = {}
 
-    #Setup WebDriver
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Chrome(options=options)
-    def close_driver():
-        try:
-            driver.quit()
-        except Exception:
-            pass
-
-    atexit.register(close_driver)
-    print("Initializing WebDriver...")
-    if await_debug:
-        time.sleep(13) # Await all debug prints from selenium to finish
-
     #Search and scrape each category
     for search_term in search_terms:
-        products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver, db_uri=db_uri, category = search_term)
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        driver = webdriver.Chrome(options=options)
+        print(f"Initializing WebDriver for {search_term}...")
+        try:
+            if await_debug:
+                time.sleep(13)
+            products = scrape_category(f"https://www.otto.de/suche/{search_term}/?verkaeufer=otto", x_paths=x_paths, driver=driver, db_uri=db_uri, category = search_term)
+        finally:
+            driver.quit()
+
         print(f"Collected {len(products)} unique products!")        
         # Handle Data storage
         replaced = database_handler.replace_category(category=search_term, product_data=products)
@@ -179,9 +173,6 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
         print(f"Category: {category}, Articles: {len(category_dict[category])}")
     total_count = sum(len(category) for category in category_dict.values())
     print(f"Total articles scraped: {total_count}")
-
-    close_driver()
-    atexit.unregister(close_driver)
 
 if __name__ == "__main__":
     
