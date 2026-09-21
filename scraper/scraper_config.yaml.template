@@ -47,6 +47,6 @@ paths:
     price: .//div[contains(@class, 'reptile-card')]//ofc-pricing-item-v1
     img: .//div[contains(@class, 'reptile-card')]//div[contains(@class, 'reptile-product-image')]//img
 db:
-    link: mongodb+srv://<User>:<Password>@higherlower.ojazzfb.mongodb.net/?appName=HigherLower
+    link: mongodb+srv://<db_username>:<db_password>@higher-lower.flohznp.mongodb.net/?appName=higher-lower
 
 
