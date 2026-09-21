@@ -101,19 +101,23 @@ def scrape_category(url:str, x_paths:dict, db_uri:str, category:str, driver:webd
 
     #Setup parameters
     driver.get(url)
-    max_height = driver.execute_script("return document.body.scrollHeight")
     current_height = 0
     product_data = []
 
 
     #scroll through the page and scrape loaded products
     step_size_px = 500
-    while current_height < max_height:  
+    while True:  
         current_height += step_size_px
-        percentage = min(100, int((current_height / max_height) * 100))
         driver.execute_script(f"window.scrollTo(0, {current_height});")
         time.sleep(.05) # give page some time to load on each step, could prob be optimized
+
+        max_height = driver.execute_script("return document.body.scrollHeight")
+        percentage = min(100, int((current_height / max_height) * 100))
         print(f"\033[FLoaded: {percentage}% of page!" )
+
+        if current_height >= max_height:
+            break
 
     print("Collecting Data...\n")
     product_data.extend(scraper(x_paths=x_paths, driver=driver, category = category))
@@ -168,6 +172,10 @@ def scrape_main(search_terms:list, x_paths:dict, db_uri:str, export_path:str='ar
         if not replaced:
             raise RuntimeError(f"Failed to replace category: {search_term}")
         category_dict[search_term] = products
+
+        driver.get("about:blank")
+        driver.delete_all_cookies()
+
         print("---------------------------------------------------------")
 
     # Export data to JSON
